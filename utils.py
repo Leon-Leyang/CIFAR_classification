@@ -65,10 +65,10 @@ def apply_pca(dim, train_x, test_x):
     return new_train_x, new_test_x
 
 
-def cross_val_pca(dim, fold, model, full_train_data):
-    """Cross validation for the model that needs to use data processed with PCA
+def cross_val_pca(dim, fold, full_train_data):
+    """Cross validation for a SVM trained on data whose dimension is reduced to a specific value with PCA
 
-    :return: Average precision, recall, f1 values (for each class) and accuracy of the model
+    :return: Average precision, recall, f1 values (for each class) and accuracy of the SVM
     """
     # Lists that store the values of metrics in each round
     precision_lst = []
@@ -105,4 +105,4 @@ def cross_val_pca(dim, fold, model, full_train_data):
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = next(iter(train_loader))
-    cross_val_pca(1000, 5, None, train_data)
+    cross_val_pca(1000, 5, train_data)
