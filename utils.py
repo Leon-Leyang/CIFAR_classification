@@ -1,5 +1,6 @@
 from sklearn.decomposition import PCA
 
+import math
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -64,12 +65,39 @@ def apply_pca(dim, train_x, test_x):
     return new_train_x, new_test_x
 
 
-def cross_val_pca(model, fold):
-    """Cross validation for the model that needs to use PCA processed data
+def cross_val_pca(fold, model, full_train_data):
+    """Cross validation for the model that needs to use data processed with PCA
 
-    :return: Precision, recall, f1 values (for each class) and accuracy of the model
+    :return: Average precision, recall, f1 values (for each class) and accuracy of the model
     """
+    # Lists that store the values of metrics in each round
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    # Calculate the number of data per fold
+    num_total = full_train_data[0].shape[0]
+    num_per_fold = math.ceil(num_total / fold)
+
+    # Cross validation
+    for idx in range(fold):
+        # Get the train data and val data for this round
+        # If the selected val set is not the last fold
+        if idx != fold - 1:
+            val_x = full_train_data[0][idx * num_per_fold:(idx + 1) * num_per_fold]
+            val_y = full_train_data[1][idx * num_per_fold:(idx + 1) * num_per_fold]
+            train_x = torch.cat((full_train_data[0][:idx * num_per_fold], full_train_data[0][(idx + 1) * num_per_fold:]), 0)
+            train_y = torch.cat((full_train_data[1][:idx * num_per_fold], full_train_data[1][(idx + 1) * num_per_fold:]), 0)
+        # If the selected val set is the last fold
+        else:
+            val_x = full_train_data[0][idx * num_per_fold:]
+            val_y = full_train_data[1][idx * num_per_fold:]
+            train_x = full_train_data[0][:idx * num_per_fold]
+            train_y = full_train_data[1][:idx * num_per_fold]
 
 
 if __name__ == '__main__':
-    train_loader, test_loader = init_loader()
+    train_loader, test_loader = init_loader(full=True)
+    train_data = next(iter(train_loader))
+    cross_val_pca(5, None, train_data)
