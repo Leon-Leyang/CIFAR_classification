@@ -41,30 +41,34 @@ def init_loader(batch_size=16, full=False):
     return train_loader, test_loader
 
 
-def apply_pca(dim, train_data, val_data, test_data):
-    """Applys the PCA trained on train data on train, validation and test data
+def apply_pca(dim, train_x, val_x, test_x):
+    """Applys the PCA trained on X of train data on X of train, validation and test data
 
     :param dim: Dimension of the data after PCA
-    :param train_data: Train data of shape B*C*H*W
-    :param val_data: Validation data of shape B*C*H*W
-    :param test_data: Test data of shape B*C*H*W
-    :return: train, validation and test data after PCA
+    :param train_x: X of train data of shape B*C*H*W
+    :param val_x: X of validation data of shape B*C*H*W
+    :param test_x: X of test data of shape B*C*H*W
+    :return: X of train, validation and test data after PCA
     """
     # Flatten the data of shape B*C*H*W to B*(C*H*W)
-    f_train_data = torch.flatten(train_data, start_dim=1)
-    f_val_data = torch.flatten(val_data, start_dim=1)
-    f_test_data = torch.flatten(test_data, start_dim=1)
+    f_train_x = torch.flatten(train_x, start_dim=1)
+    f_val_x = torch.flatten(val_x, start_dim=1)
+    f_test_x = torch.flatten(test_x, start_dim=1)
 
     # Train a PCA with train data
     pca = PCA(n_components=dim)
-    pca.fit(f_train_data)
+    pca.fit(f_train_x)
 
     # Transform the data
-    new_train_data = pca.transform(f_train_data)
-    new_val_data = pca.transform(f_val_data)
-    new_test_data = pca.transform(f_test_data)
+    new_train_x = pca.transform(f_train_x)
+    new_val_x = pca.transform(f_val_x)
+    new_test_x = pca.transform(f_test_x)
 
-    return new_train_data, new_val_data, new_test_data
+    return new_train_x, new_val_x, new_test_x
+
+
+def cross_val():
+    pass
 
 
 if __name__ == '__main__':
