@@ -43,7 +43,7 @@ def init_loader(batch_size=16, full=False):
 
 
 def apply_pca(dim, train_x, test_x):
-    """Applies the PCA trained on X of train data on X of train and test data
+    """Trains a PCA on X of train data and applies it on X of train and test data
 
     :param dim: Dimension of the data after PCA
     :param train_x: X of train data of shape B*C*H*W
@@ -65,7 +65,7 @@ def apply_pca(dim, train_x, test_x):
     return new_train_x, new_test_x
 
 
-def cross_val_pca(fold, model, full_train_data):
+def cross_val_pca(dim, fold, model, full_train_data):
     """Cross validation for the model that needs to use data processed with PCA
 
     :return: Average precision, recall, f1 values (for each class) and accuracy of the model
@@ -96,8 +96,13 @@ def cross_val_pca(fold, model, full_train_data):
             train_x = full_train_data[0][:idx * num_per_fold]
             train_y = full_train_data[1][:idx * num_per_fold]
 
+        # Process train_x and val_x with PCA
+        new_train_x, new_val_x = apply_pca(dim, train_x, val_x)
+        # print(f'{new_train_x.shape}, {train_y.shape}, {new_val_x.shape}, {val_y.shape}')
+
+
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = next(iter(train_loader))
-    cross_val_pca(5, None, train_data)
+    cross_val_pca(1000, 5, None, train_data)
