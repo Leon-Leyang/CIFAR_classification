@@ -1,4 +1,6 @@
+from sklearn import svm
 from sklearn.decomposition import PCA
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 import math
 import torch
@@ -76,6 +78,9 @@ def cross_val_pca(dim, fold, full_train_data):
     f1_lst = []
     accuracy_lst = []
 
+    # Init a SVM
+    clf = svm.SVC(kernel='linear', verbose=True)
+
     # Calculate the number of data per fold
     num_total = full_train_data[0].shape[0]
     num_per_fold = math.ceil(num_total / fold)
@@ -96,13 +101,23 @@ def cross_val_pca(dim, fold, full_train_data):
             train_x = full_train_data[0][:idx * num_per_fold]
             train_y = full_train_data[1][:idx * num_per_fold]
 
-        # Process train_x and val_x with PCA
-        new_train_x, new_val_x = apply_pca(dim, train_x, val_x)
-        # print(f'{new_train_x.shape}, {train_y.shape}, {new_val_x.shape}, {val_y.shape}')
+        # Process train_x and val_x with PCA if dim is not equal to -1
+        if dim != -1:
+            train_x, val_x = apply_pca(dim, train_x, val_x)
+        print(f'{train_x.shape}, {train_y.shape}, {val_x.shape}, {val_y.shape}')
 
+        # Train the SVM
+        clf.fit(train_x, train_y)
+        # Eval the SVM
+        pred = clf.predict(val_x)
+        precision = precision_score(val_y, pred, average='None')
+        recall = recall_score(val_y, pred, average='None')
+        f1 = f1_score(val_y, pred, average='None')
+        accuracy = accuracy_score(val_y, pred)
+        print(f'precision: {precision}, recall: {recall}, f1: {f1}, accuracy: {accuracy}')
 
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = next(iter(train_loader))
-    cross_val_pca(1000, 5, train_data)
+    cross_val_pca(100, 5, train_data)
