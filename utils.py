@@ -37,13 +37,13 @@ def init_loader(batch_size=16, full=False):
     return train_loader, test_loader
 
 
-def get_subset(loader, size):
-    """Gets a subset from the loader of the specified size
+def get_data_once(loader, size):
+    """Gets a number of data from the loader at once
 
-    If the size is -1, the whole data will be returned.
+    If the size is -1, all data in the data loader will be returned.
     :param loader: Data loader
-    :param size: Size of the subset
-    :return: The subset of the specified size
+    :param size: Size of the returned data
+    :return: The data of the specified size
     """
     # Fix the seed so that the data from each run stays the same
     seed = 10
@@ -52,13 +52,12 @@ def get_subset(loader, size):
     # Get a generator from the loader
     data = next(iter(loader))
 
-    # Get the subset of the data
-    sub_data = [data[0][:size], data[1][:size]]
+    # Get the data of the specified size
+    data = [data[0][:size], data[1][:size]]
 
-    return sub_data
+    return data
 
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
-
-    train_data = get_subset(train_loader, 5000)
+    train_data = get_data_once(train_loader, 5000)

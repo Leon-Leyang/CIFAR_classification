@@ -6,6 +6,8 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
+from utils import init_loader, get_data_once
+
 
 def apply_pca(dim, train_x, test_x):
     """Trains a PCA on X of train data and applies it on X of train and test data
@@ -98,5 +100,15 @@ def cross_val_pca(dim, fold, full_train_data):
     return avg_precision, avg_recall, avg_f1, avg_accuracy
 
 
-if __name__ == '__main__':
+def eval_linear_svm(dims):
+    """Evaluates performances of a series of linear SVMs trained on dimension-variant features
+
+    :param dims: List of different dimensions
+    """
     pass
+
+
+if __name__ == '__main__':
+    train_loader, test_loader = init_loader(full=True)
+    train_data = get_data_once(train_loader, 5000)
+    test_data = get_data_once(test_loader, -1)
