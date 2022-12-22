@@ -15,9 +15,7 @@ def init_loader(batch_size=16, full=False):
     If the second is True, the batch size will be equal to the size of the whole dataset.
     By default, it returns loaders with a batch size of 16
     :param batch_size: Batch size for the loaders
-    :type batch_size: int
     :param full: If the whole dataset will be returned as one batch
-    :type full: bool
 
     :return: train loader, test loader
     """
@@ -42,6 +40,27 @@ def init_loader(batch_size=16, full=False):
                                                   shuffle=False, num_workers=2)
 
     return train_loader, test_loader
+
+
+def get_subset(loader, size):
+    """Gets a subset from the loader of the specified size
+
+    If the size is -1, the whole data will be returned.
+    :param loader: Data loader
+    :param size: Size of the subset
+    :return: The subset of the specified size
+    """
+    # Fix the seed so that the data from each run stays the same
+    seed = 10
+    torch.manual_seed(seed)
+
+    # Get a generator from the loader
+    data = next(iter(loader))
+
+    # Get the subset of the data
+    sub_data = [data[0][:size], data[1][:size]]
+
+    return sub_data
 
 
 def apply_pca(dim, train_x, test_x):
@@ -108,16 +127,19 @@ def cross_val_pca(dim, fold, full_train_data):
 
         # Train the SVM
         clf.fit(train_x, train_y)
+
         # Eval the SVM
         pred = clf.predict(val_x)
         precision = precision_score(val_y, pred, average='None')
         recall = recall_score(val_y, pred, average='None')
         f1 = f1_score(val_y, pred, average='None')
         accuracy = accuracy_score(val_y, pred)
-        print(f'precision: {precision}, recall: {recall}, f1: {f1}, accuracy: {accuracy}')
+        print(f'round {idx + 1}\nprecision: {precision}, recall: {recall}, f1: {f1}, accuracy: {accuracy}')
 
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
-    train_data = next(iter(train_loader))
-    cross_val_pca(100, 5, train_data)
+
+    train_data = get_subset(train_loader, 5000)
+
+    cross_val_pca(1000, 5, train_data)
