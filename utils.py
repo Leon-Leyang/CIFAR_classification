@@ -3,6 +3,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 import math
+import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -76,7 +77,7 @@ def apply_pca(dim, train_x, test_x):
     f_test_x = torch.flatten(test_x, start_dim=1)
 
     # Train a PCA with train data
-    pca = PCA(n_components=dim)
+    pca = PCA(n_components=dim, random_state=10)
     pca.fit(f_train_x)
 
     # Transform the data
@@ -123,7 +124,6 @@ def cross_val_pca(dim, fold, full_train_data):
         # Process train_x and val_x with PCA if dim is not equal to -1
         if dim != -1:
             train_x, val_x = apply_pca(dim, train_x, val_x)
-        # print(f'{train_x.shape}, {train_y.shape}, {val_x.shape}, {val_y.shape}')
 
         # Train the SVM
         clf.fit(train_x, train_y)
@@ -134,7 +134,20 @@ def cross_val_pca(dim, fold, full_train_data):
         recall = recall_score(val_y, pred, average=None)
         f1 = f1_score(val_y, pred, average=None)
         accuracy = accuracy_score(val_y, pred)
-        print(f'round {idx + 1}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
+
+        # Record the values of metrics in this round
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+        print(f'Round {idx + 1}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
+
+    # Calculate average values of metrics in all rounds
+    avg_precision = np.mean(precision_lst, axis=0)
+    avg_recall = np.mean(recall_lst, axis=0)
+    avg_f1 = np.mean(f1_lst, axis=0)
+    avg_accuracy = np.mean(accuracy_lst, axis=0)
+    print(f'Average\nprecision: {avg_precision}\nrecall: {avg_recall}\nf1: {avg_f1}\naccuracy: {avg_accuracy}\n')
 
 
 if __name__ == '__main__':
