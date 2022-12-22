@@ -84,8 +84,9 @@ def get_data_once(loader, size):
     return data
 
 
-def plot_x_cls(metric_name, metric_lst, dims, test):
-    """Plot and save a line chart whose x-axis takes the names of classes and each metric value in metric_lst corresponds to a line
+def plot_multi_line(metric_name, metric_lst, dims, test):
+    """Plots and saves a line chart with multiple lines, where x-axis takes the names of classes and each metric value
+    in metric_lst corresponds to a line
 
     Save the plot in a file whose name follows the format: dims-metric_name-phase.png.
     For example: 3072_2000_1000-precision-test.png
@@ -117,6 +118,30 @@ def plot_x_cls(metric_name, metric_lst, dims, test):
     dim_str = '_'.join([str(x) for x in dims])
     root_dir = get_root_dir()
     plt.savefig(f'{root_dir}/result/{dim_str}-{metric_name}-{phase}.png')
+
+
+def plot_single_line(accuracy_lst, dims, test):
+    """Plots a line chart with a single line, where x-axis takes the dimensions
+
+    :param accuracy_lst: List of the accuracy value
+    :param dims: Dimensions corresponding to accuracy values
+    :param test: If this plot is generated during test or validation
+    """
+    # Clear the previous content
+    plt.clf()
+    plt.cla()
+
+    # Plot the accuracy
+    plt.plot(dims, accuracy_lst, marker='o')
+
+    plt.xlabel('dimension')
+    plt.ylabel('accuracy')
+
+    # Save the plot
+    phase = 'test' if test else 'val'
+    dim_str = '_'.join([str(x) for x in dims])
+    root_dir = get_root_dir()
+    plt.savefig(f'{root_dir}/result/{dim_str}-accuracy-{phase}.png')
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-from utils import init_loader, get_data_once, plot_x_cls
+from utils import init_loader, get_data_once, plot_multi_line, plot_single_line
 
 
 def apply_pca(dim, train_x, test_x):
@@ -110,7 +110,8 @@ def val_linear_svm(dims, fold, train_data):
 
     The evaluation will be done on the val set.
     :param dims: List of different dimensions
-    :param test: If the evaluation is done on test set
+    :param fold: Number of folds for cross validation
+    :param train_data: Train data
     """
     # Lists that store the values of metrics for each selected dimension
     precision_lst = []
@@ -128,10 +129,11 @@ def val_linear_svm(dims, fold, train_data):
         f1_lst.append(f1)
         accuracy_lst.append(accuracy)
 
-    plot_x_cls('precision', precision_lst, dims, False)
-    plot_x_cls('recall', recall_lst, dims, False)
-    plot_x_cls('f1', f1_lst, dims, False)
-
+    # Plot and save the result
+    plot_multi_line('precision', precision_lst, dims, False)
+    plot_multi_line('recall', recall_lst, dims, False)
+    plot_multi_line('f1', f1_lst, dims, False)
+    plot_single_line(accuracy_lst, dims, False)
 
 
 if __name__ == '__main__':
@@ -142,4 +144,3 @@ if __name__ == '__main__':
     dims = [3072, 2000]
     fold = 5
     val_linear_svm(dims, 5, train_data)
-
