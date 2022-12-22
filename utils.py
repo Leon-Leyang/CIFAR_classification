@@ -2,6 +2,10 @@ import os
 import torch
 import torchvision
 import torchvision.transforms as transforms
+import matplotlib.pyplot as plt
+
+# import matplotlib
+# matplotlib.use('TkAgg')
 
 
 def get_root_dir():
@@ -11,6 +15,14 @@ def get_root_dir():
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
     return root_dir
+
+
+def get_cls_name():
+    """Get the class names
+
+    :return: The list of class names of CIFAR-10
+    """
+    return ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 
 def init_loader(batch_size=16, full=False):
@@ -70,6 +82,41 @@ def get_data_once(loader, size):
         data = [data[0][:size], data[1][:size]]
 
     return data
+
+
+def plot_x_cls(metric_name, metric_lst, dims, test):
+    """Plot and save a line chart whose x-axis takes the names of classes and each metric value in metric_lst corresponds to a line
+
+    Save the plot in a file whose name follows the format: dims-metric_name-phase.png.
+    For example: 3072_2000_1000-precision-test.png
+    :param metric_name: Name of the metric
+    :param metric_lst: List of the metric value
+    :param dims: Dimensions corresponding to metric values
+    :param test: If this plot is generated during test or validation
+    """
+    # Clear the previous content
+    plt.clf()
+    plt.cla()
+
+    # Get the class names
+    cls_lst = get_cls_name()
+    x = range(len(cls_lst))
+
+    # Plot each metric value
+    for idx, metric in enumerate(metric_lst):
+        plt.plot(x, metric, marker='o', label=dims[idx])
+
+    # Show the legend
+    plt.legend()
+    # Show class names on the x-axis
+    plt.xticks(x, cls_lst, rotation=45)
+    plt.ylabel('precision')
+
+    # Save the plot
+    phase = 'test' if test else 'val'
+    dim_str = '_'.join([str(x) for x in dims])
+    root_dir = get_root_dir()
+    plt.savefig(f'{root_dir}/result/{dim_str}-{metric_name}-{phase}.png')
 
 
 if __name__ == '__main__':

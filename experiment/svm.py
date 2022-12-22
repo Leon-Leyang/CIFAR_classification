@@ -6,7 +6,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-from utils import init_loader, get_data_once
+from utils import init_loader, get_data_once, plot_x_cls
 
 
 def apply_pca(dim, train_x, test_x):
@@ -32,12 +32,12 @@ def apply_pca(dim, train_x, test_x):
     return new_train_x, new_test_x
 
 
-def cross_val_pca(dim, fold, full_train_data):
+def cross_val_pca(dim, fold, train_data):
     """Cross validation for a SVM trained on data whose dimension is reduced to a specific value with PCA
 
     :param dim: Dimension of the data after PCA
     :param fold: Number of folds in cross validation
-    :param full_train_data: Train data, a list of two tensors in which the first's shape is B*C*H*W and the second is B
+    :param train_data: Train data, a list of two tensors in which the first's shape is B*C*H*W and the second is B
     :return: Average precision, recall, f1 values (for each class) and accuracy of the SVM
     """
     # Lists that store the values of metrics in each round
@@ -50,7 +50,7 @@ def cross_val_pca(dim, fold, full_train_data):
     clf = svm.SVC(kernel='linear')
 
     # Calculate the number of data per fold
-    num_total = full_train_data[0].shape[0]
+    num_total = train_data[0].shape[0]
     num_per_fold = math.ceil(num_total / fold)
 
     # Cross validation
@@ -58,20 +58,25 @@ def cross_val_pca(dim, fold, full_train_data):
         # Get the train data and val data for this round
         # If the selected val set is not the last fold
         if idx != fold - 1:
-            val_x = full_train_data[0][idx * num_per_fold:(idx + 1) * num_per_fold]
-            val_y = full_train_data[1][idx * num_per_fold:(idx + 1) * num_per_fold]
-            train_x = torch.cat((full_train_data[0][:idx * num_per_fold], full_train_data[0][(idx + 1) * num_per_fold:]), 0)
-            train_y = torch.cat((full_train_data[1][:idx * num_per_fold], full_train_data[1][(idx + 1) * num_per_fold:]), 0)
+            val_x = train_data[0][idx * num_per_fold:(idx + 1) * num_per_fold]
+            val_y = train_data[1][idx * num_per_fold:(idx + 1) * num_per_fold]
+            train_x = torch.cat((train_data[0][:idx * num_per_fold], train_data[0][(idx + 1) * num_per_fold:]), 0)
+            train_y = torch.cat((train_data[1][:idx * num_per_fold], train_data[1][(idx + 1) * num_per_fold:]), 0)
         # If the selected val set is the last fold
         else:
-            val_x = full_train_data[0][idx * num_per_fold:]
-            val_y = full_train_data[1][idx * num_per_fold:]
-            train_x = full_train_data[0][:idx * num_per_fold]
-            train_y = full_train_data[1][:idx * num_per_fold]
+            val_x = train_data[0][idx * num_per_fold:]
+            val_y = train_data[1][idx * num_per_fold:]
+            train_x = train_data[0][:idx * num_per_fold]
+            train_y = train_data[1][:idx * num_per_fold]
 
-        # Process train_x and val_x with PCA if dim is not equal to -1
-        if dim != -1:
+        # Process train_x and val_x with PCA if dim is not equal to 3072
+        if dim != 3072:
             train_x, val_x = apply_pca(dim, train_x, val_x)
+        # If dim is equal to 3072, flatten data to shape B*(C*H*W)
+        else:
+            train_x, val_x = torch.flatten(train_x, start_dim=1), torch.flatten(val_x, start_dim=1)
+
+        assert train_x.shape[1] == dim and val_x.shape[1] == dim, 'Something wrong when dealing with the dimension'
 
         # Train the SVM
         clf.fit(train_x, train_y)
@@ -100,15 +105,41 @@ def cross_val_pca(dim, fold, full_train_data):
     return avg_precision, avg_recall, avg_f1, avg_accuracy
 
 
-def eval_linear_svm(dims):
+def val_linear_svm(dims, fold, train_data):
     """Evaluates performances of a series of linear SVMs trained on dimension-variant features
 
+    The evaluation will be done on the val set.
     :param dims: List of different dimensions
+    :param test: If the evaluation is done on test set
     """
-    pass
+    # Lists that store the values of metrics for each selected dimension
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    # Iterate through the selected dimensions and do cross validation
+    for dim in dims:
+        precision, recall, f1, accuracy = cross_val_pca(dim, fold, train_data)
+
+        # Record the values of metrics for this selected dimension
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+
+    plot_x_cls('precision', precision_lst, dims, False)
+    plot_x_cls('recall', recall_lst, dims, False)
+    plot_x_cls('f1', f1_lst, dims, False)
+
 
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = get_data_once(train_loader, 5000)
     test_data = get_data_once(test_loader, -1)
+
+    dims = [3072, 2000]
+    fold = 5
+    val_linear_svm(dims, 5, train_data)
+
