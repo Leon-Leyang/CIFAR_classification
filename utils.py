@@ -98,7 +98,7 @@ def cross_val_pca(dim, fold, full_train_data):
     accuracy_lst = []
 
     # Init a SVM
-    clf = svm.SVC(kernel='linear', verbose=True)
+    clf = svm.SVC(kernel='linear')
 
     # Calculate the number of data per fold
     num_total = full_train_data[0].shape[0]
@@ -123,18 +123,18 @@ def cross_val_pca(dim, fold, full_train_data):
         # Process train_x and val_x with PCA if dim is not equal to -1
         if dim != -1:
             train_x, val_x = apply_pca(dim, train_x, val_x)
-        print(f'{train_x.shape}, {train_y.shape}, {val_x.shape}, {val_y.shape}')
+        # print(f'{train_x.shape}, {train_y.shape}, {val_x.shape}, {val_y.shape}')
 
         # Train the SVM
         clf.fit(train_x, train_y)
 
         # Eval the SVM
         pred = clf.predict(val_x)
-        precision = precision_score(val_y, pred, average='None')
-        recall = recall_score(val_y, pred, average='None')
-        f1 = f1_score(val_y, pred, average='None')
+        precision = precision_score(val_y, pred, average=None)
+        recall = recall_score(val_y, pred, average=None)
+        f1 = f1_score(val_y, pred, average=None)
         accuracy = accuracy_score(val_y, pred)
-        print(f'round {idx + 1}\nprecision: {precision}, recall: {recall}, f1: {f1}, accuracy: {accuracy}')
+        print(f'round {idx + 1}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
 
 
 if __name__ == '__main__':
