@@ -1,6 +1,16 @@
+import os
 import torch
 import torchvision
 import torchvision.transforms as transforms
+
+
+def get_root_dir():
+    """Gets the root path of the current project
+
+    :return: The root path of the current project
+    """
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    return root_dir
 
 
 def init_loader(batch_size=16, full=False):
@@ -14,13 +24,16 @@ def init_loader(batch_size=16, full=False):
 
     :return: train loader, test loader
     """
+    # Get the root directory of the project
+    root_dir = get_root_dir()
+
     transform = transforms.Compose(
         [transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
+    train_set = torchvision.datasets.CIFAR10(root=f'{root_dir}/data', train=True,
                                              download=True, transform=transform)
-    test_set = torchvision.datasets.CIFAR10(root='./data', train=False,
+    test_set = torchvision.datasets.CIFAR10(root=f'{root_dir}/data', train=False,
                                             download=True, transform=transform)
 
     if not full:
@@ -52,8 +65,9 @@ def get_data_once(loader, size):
     # Get a generator from the loader
     data = next(iter(loader))
 
-    # Get the data of the specified size
-    data = [data[0][:size], data[1][:size]]
+    # If size is not -1, slice the data to the specified size
+    if size != -1:
+        data = [data[0][:size], data[1][:size]]
 
     return data
 
