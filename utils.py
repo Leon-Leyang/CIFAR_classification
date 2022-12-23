@@ -111,12 +111,14 @@ def plot_multi_line(metric_name, metric_lst, dims, test):
     plt.legend()
     # Show class names on the x-axis
     plt.xticks(x, cls_lst, rotation=45)
-    plt.ylabel('precision')
+    plt.ylabel(metric_name)
 
     # Save the plot
     phase = 'test' if test else 'val'
     dim_str = '_'.join([str(x) for x in dims])
     root_dir = get_root_dir()
+    if not(os.path.exists(f'{root_dir}/result')):
+        os.makedirs(f'{root_dir}/result')
     plt.savefig(f'{root_dir}/result/{dim_str}-{metric_name}-{phase}.png')
 
 
