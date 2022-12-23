@@ -6,7 +6,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-from utils import init_loader, get_data_once, plot_multi_line, plot_single_line
+from utils import init_loader, get_data_once, plot_result
 
 
 def apply_pca(amount, train_x, test_x):
@@ -84,15 +84,8 @@ def cross_val_pca(amount, fold, train_data):
         # Record the number of dimensions used in PCA in this round
         dim_lst.append(dim)
 
-        # Train the SVM
-        clf.fit(train_x, train_y)
-
-        # Eval the SVM
-        pred = clf.predict(val_x)
-        precision = precision_score(val_y, pred, average=None)
-        recall = recall_score(val_y, pred, average=None)
-        f1 = f1_score(val_y, pred, average=None)
-        accuracy = accuracy_score(val_y, pred)
+        # Train and evaluate the SVM
+        precision, recall, f1, accuracy = train_eval_svm(clf, train_x, train_y, val_x, val_y)
 
         # Record the values of metrics in this round
         precision_lst.append(precision)
@@ -113,6 +106,29 @@ def cross_val_pca(amount, fold, train_data):
     print(f'Amount: {amount}, Dimension: {avg_dim}\nprecision: {avg_precision}\nrecall: {avg_recall}\nf1: {avg_f1}\naccuracy: {avg_accuracy}\n')
 
     return avg_dim, avg_precision, avg_recall, avg_f1, avg_accuracy
+
+
+def train_eval_svm(clf, train_x, train_y, test_x, test_y):
+    """Trains and evaluates a SVM
+
+    :param clf: A SVM
+    :param train_x: X of train data
+    :param train_y: Y of train data
+    :param test_x: X of test data
+    :param test_y: Y of test data
+    :return: Precision, recall, f1 values (for each class) and accuracy of the SVM
+    """
+    # Train the SVM
+    clf.fit(train_x, train_y)
+
+    # Eval the SVM
+    pred = clf.predict(test_x)
+    precision = precision_score(test_y, pred, average=None)
+    recall = recall_score(test_y, pred, average=None)
+    f1 = f1_score(test_y, pred, average=None)
+    accuracy = accuracy_score(test_y, pred)
+
+    return precision, recall, f1, accuracy
 
 
 def val_linear_svm(amounts, fold, train_data):
@@ -146,10 +162,44 @@ def val_linear_svm(amounts, fold, train_data):
         dim_lst.append(dim)
 
     # Plot and save the result
-    plot_multi_line('precision', precision_lst, dim_lst, False)
-    plot_multi_line('recall', recall_lst, dim_lst, False)
-    plot_multi_line('f1', f1_lst, dim_lst, False)
-    plot_single_line(accuracy_lst, dim_lst, False)
+    plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
+
+
+def test_linear_svm(amounts, train_data, test_data):
+    # Lists that store the values of metrics for each selected amount
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    # List that stores the number of dimension used in PCA for each selected amount
+    dim_lst = []
+
+    # Init a SVM
+    clf = svm.SVC(kernel='linear')
+
+    for amount in amounts:
+        train_x = train_data[0]
+        train_y = train_data[1]
+        test_x = test_data[0]
+        test_y = test_data[1]
+
+        dim, train_x, test_x = apply_pca(amount, train_x, test_x)
+
+        # Train and evaluate the SVM
+        precision, recall, f1, accuracy = train_eval_svm(clf, train_x, train_y, test_x, test_y)
+
+        # Record the values of metrics for this selected amount
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+
+        # Record the number of dimensions used in PCA for this selected amount
+        dim_lst.append(dim)
+
+    # Plot and save the result
+    plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
 
 
 if __name__ == '__main__':
@@ -157,6 +207,7 @@ if __name__ == '__main__':
     train_data = get_data_once(train_loader, 5000)
     test_data = get_data_once(test_loader, -1)
 
-    amounts = np.arange(0.1, 1.01, 0.1)
+    amounts = np.arange(0.7, 0.81, 0.1)
     fold = 5
-    val_linear_svm(amounts, 5, train_data)
+    # val_linear_svm(amounts, 5, train_data)
+    test_linear_svm(amounts, train_data, test_data)

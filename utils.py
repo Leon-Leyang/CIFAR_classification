@@ -146,6 +146,22 @@ def plot_single_line(accuracy_lst, dims, test):
     plt.savefig(f'{root_dir}/result/{dim_str}-accuracy-{phase}.png')
 
 
+def plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, test):
+    """Plots and saves the result
+
+    :param dim_lst: List of numbers of dimensions used in PCA
+    :param precision_lst: List of the precision value
+    :param recall_lst: List of the recall value
+    :param f1_lst: List of the f1 value
+    :param accuracy_lst: List of the accuracy value
+    :param test: If this plot is generated during test or validation
+    """
+    plot_multi_line('precision', precision_lst, dim_lst, test)
+    plot_multi_line('recall', recall_lst, dim_lst, test)
+    plot_multi_line('f1', f1_lst, dim_lst, test)
+    plot_single_line(accuracy_lst, dim_lst, test)
+
+
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = get_data_once(train_loader, 5000)
