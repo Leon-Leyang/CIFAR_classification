@@ -81,7 +81,7 @@ def get_data_once(loader, size):
     return data
 
 
-def plot_multi_line(hyper_param_name, metric_name, metric_lst, dims, test):
+def plot_multi_line(hyper_param_name, metric_name, metric_lst, hyper_param_lst, test):
     """Plots and saves a line chart with multiple lines, where x-axis takes the names of classes and each metric value
     in metric_lst corresponds to a line
 
@@ -90,7 +90,7 @@ def plot_multi_line(hyper_param_name, metric_name, metric_lst, dims, test):
     :param hyper_param_name: The name of the hyperparameter
     :param metric_name: Name of the metric
     :param metric_lst: List of the metric value
-    :param dims: Dimensions corresponding to metric values
+    :param hyper_param_lst: Hyperparameters corresponding to accuracy values
     :param test: If this plot is generated during test or validation
     """
     # Clear the previous content
@@ -103,7 +103,7 @@ def plot_multi_line(hyper_param_name, metric_name, metric_lst, dims, test):
 
     # Plot each metric value
     for idx, metric in enumerate(metric_lst):
-        plt.plot(x, metric, marker='o', label=dims[idx])
+        plt.plot(x, metric, marker='o', label=hyper_param_lst[idx])
 
     # Show the legend
     plt.legend()
@@ -113,11 +113,12 @@ def plot_multi_line(hyper_param_name, metric_name, metric_lst, dims, test):
 
     # Save the plot
     phase = 'test' if test else 'val'
-    dim_str = '_'.join([str(x) for x in dims])
+    hyper_param_str = '_'.join([str(x) for x in hyper_param_lst])
+    # hyper_param_str = '0.2_0.4_0.6_0.8_1.0_1.2_1.4_1.6_1.8_2.0_2.2_2.4_2.6_2.8_3.0_3.2_3.4_3.6_3.8_4.0'
     root_dir = get_root_dir()
     if not(os.path.exists(f'{root_dir}/result')):
         os.makedirs(f'{root_dir}/result')
-    plt.savefig(f'{root_dir}/result/{hyper_param_name}-{dim_str}-{metric_name}-{phase}.png')
+    plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-{metric_name}-{phase}.png')
 
 
 def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
@@ -142,6 +143,7 @@ def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
     # Save the plot
     phase = 'test' if test else 'val'
     hyper_param_str = '_'.join([str(x) for x in hyper_param_lst])
+    # hyper_param_str = '0.2_0.4_0.6_0.8_1.0_1.2_1.4_1.6_1.8_2.0_2.2_2.4_2.6_2.8_3.0_3.2_3.4_3.6_3.8_4.0'
     root_dir = get_root_dir()
     plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-accuracy-{phase}.png')
 
