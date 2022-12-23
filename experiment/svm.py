@@ -12,23 +12,30 @@ from utils import init_loader, get_data_once, plot_result
 def apply_pca(amount, train_x, test_x):
     """Trains a PCA on X of train data and applies it on X of train and test data
 
+    If the amount is 1, simply flatten the data without PCA processing
     :param amount: The least amount of variance that needs to be explained
     :param train_x: X of train data of shape B*C*H*W
     :param test_x: X of test data of shape B*C*H*W
     :return: The number of dimension used in PCA and X of train and test data after PCA
     """
-    # Flatten the data of shape B*C*H*W to B*(C*H*W)
-    f_train_x = torch.flatten(train_x, start_dim=1)
-    f_test_x = torch.flatten(test_x, start_dim=1)
+    # If amount is equal to 1, flatten data to shape B*(C*H*W)
+    if math.isclose(amount, 1, rel_tol=1e-4):
+        new_train_x, new_test_x = torch.flatten(train_x, start_dim=1), torch.flatten(test_x, start_dim=1)
+        dim = 3072
+    # Process train_x and val_x with PCA if amount is not equal to 1
+    else:
+        # Flatten the data of shape B*C*H*W to B*(C*H*W)
+        f_train_x = torch.flatten(train_x, start_dim=1)
+        f_test_x = torch.flatten(test_x, start_dim=1)
 
-    # Train a PCA with train data
-    pca = PCA(n_components=amount, random_state=10)
-    pca.fit(f_train_x)
-    dim = pca.n_components_
+        # Train a PCA with train data
+        pca = PCA(n_components=amount, random_state=10)
+        pca.fit(f_train_x)
+        dim = pca.n_components_
 
-    # Transform the data
-    new_train_x = pca.transform(f_train_x)
-    new_test_x = pca.transform(f_test_x)
+        # Transform the data
+        new_train_x = pca.transform(f_train_x)
+        new_test_x = pca.transform(f_test_x)
 
     return dim, new_train_x, new_test_x
 
@@ -73,13 +80,8 @@ def cross_val_pca(amount, fold, train_data):
             train_x = train_data[0][:idx * num_per_fold]
             train_y = train_data[1][:idx * num_per_fold]
 
-        # Process train_x and val_x with PCA if amount is not equal to 1(i.e. keep the original data)
-        if amount != 1:
-            dim, train_x, val_x = apply_pca(amount, train_x, val_x)
-        # If amount is equal to 1, flatten data to shape B*(C*H*W)
-        else:
-            train_x, val_x = torch.flatten(train_x, start_dim=1), torch.flatten(val_x, start_dim=1)
-            dim = 3072
+        # Process the data with PCA
+        dim, train_x, val_x = apply_pca(amount, train_x, val_x)
 
         # Record the number of dimensions used in PCA in this round
         dim_lst.append(dim)
@@ -166,6 +168,13 @@ def val_linear_svm(amounts, fold, train_data):
 
 
 def test_linear_svm(amounts, train_data, test_data):
+    """Evaluates performances of a series of linear SVMs trained on dimension-variant features
+
+    The evaluation will be done on the test set.
+    :param amounts: List of different amounts of variance that needs to be explained
+    :param train_data: Train data
+    :param train_data: Test data
+    """
     # Lists that store the values of metrics for each selected amount
     precision_lst = []
     recall_lst = []
@@ -184,6 +193,7 @@ def test_linear_svm(amounts, train_data, test_data):
         test_x = test_data[0]
         test_y = test_data[1]
 
+        # Process the data with PCA
         dim, train_x, test_x = apply_pca(amount, train_x, test_x)
 
         # Train and evaluate the SVM
@@ -207,7 +217,11 @@ if __name__ == '__main__':
     train_data = get_data_once(train_loader, 5000)
     test_data = get_data_once(test_loader, -1)
 
-    amounts = np.arange(0.7, 0.81, 0.1)
+    start_amount = 0.98
+    end_amount = 1.001
+    step = 0.01
+
+    amounts = np.arange(start_amount, end_amount, step)
     fold = 5
-    # val_linear_svm(amounts, 5, train_data)
-    test_linear_svm(amounts, train_data, test_data)
+    val_linear_svm(amounts, 5, train_data)
+    # test_linear_svm(amounts, train_data, test_data)
