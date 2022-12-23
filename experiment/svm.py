@@ -301,6 +301,47 @@ def val_rbf_svm(c_lst, fold, train_data):
     plot_result('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
+def test_rbf_svm(c_lst, train_data, test_data):
+    """Evaluates performances of a series of non-linear SVMs with RGF kernal
+
+    The evaluation will be done on the test set.
+    :param c_lst: List of different values of the regularization parameter C
+    :param train_data: Train data
+    :param train_data: Test data
+    """
+    # Lists that store the values of metrics for each selected c
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    for c in c_lst:
+        train_x = train_data[0]
+        train_y = train_data[1]
+        test_x = test_data[0]
+        test_y = test_data[1]
+
+        # Flatten the data of shape B*C*H*W to B*(C*H*W)
+        train_x, test_x = torch.flatten(train_x, start_dim=1), torch.flatten(test_x, start_dim=1)
+
+        # Init a non-linear SVM with RBF kernal
+        clf = svm.SVC(C=c)
+
+        # Train and evaluate the SVM
+        precision, recall, f1, accuracy = train_eval_svm(clf, train_x, train_y, test_x, test_y)
+
+        # Record the values of metrics for this selected c
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+
+        print(f'C: {c}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
+
+    # Plot and save the result
+    plot_result('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+
+
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
     train_data = get_data_once(train_loader, 5000)
@@ -317,4 +358,5 @@ if __name__ == '__main__':
 
     # cross_val_rbf_svm(10, 5, train_data)
     c_lst = [5, 10]
-    val_rbf_svm(c_lst, 5, train_data)
+    # val_rbf_svm(c_lst, 5, train_data)
+    test_rbf_svm(c_lst, train_data, test_data)
