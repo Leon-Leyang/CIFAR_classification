@@ -40,8 +40,8 @@ def apply_pca(amount, train_x, test_x):
     return dim, new_train_x, new_test_x
 
 
-def cross_val_pca(amount, fold, train_data):
-    """Cross validation for a SVM trained on data whose dimension is reduced to a specific value with PCA
+def cross_val_linear_svm(amount, fold, train_data):
+    """Cross validation for a linear SVM trained on data whose dimension is reduced to a specific value with PCA
 
     :param amount: The least amount of variance that needs to be explained
     :param fold: Number of folds in cross validation
@@ -60,25 +60,10 @@ def cross_val_pca(amount, fold, train_data):
     # Init a SVM
     clf = svm.SVC(kernel='linear')
 
-    # Calculate the number of data per fold
-    num_total = train_data[0].shape[0]
-    num_per_fold = math.ceil(num_total / fold)
-
     # Cross validation
     for idx in range(fold):
         # Get the train data and val data for this round
-        # If the selected val set is not the last fold
-        if idx != fold - 1:
-            val_x = train_data[0][idx * num_per_fold:(idx + 1) * num_per_fold]
-            val_y = train_data[1][idx * num_per_fold:(idx + 1) * num_per_fold]
-            train_x = torch.cat((train_data[0][:idx * num_per_fold], train_data[0][(idx + 1) * num_per_fold:]), 0)
-            train_y = torch.cat((train_data[1][:idx * num_per_fold], train_data[1][(idx + 1) * num_per_fold:]), 0)
-        # If the selected val set is the last fold
-        else:
-            val_x = train_data[0][idx * num_per_fold:]
-            val_y = train_data[1][idx * num_per_fold:]
-            train_x = train_data[0][:idx * num_per_fold]
-            train_y = train_data[1][:idx * num_per_fold]
+        train_x, train_y, val_x, val_y = get_cross_val_data(fold, idx, train_data)
 
         # Process the data with PCA
         dim, train_x, val_x = apply_pca(amount, train_x, val_x)
@@ -108,6 +93,34 @@ def cross_val_pca(amount, fold, train_data):
     print(f'Amount: {amount}, Dimension: {avg_dim}\nprecision: {avg_precision}\nrecall: {avg_recall}\nf1: {avg_f1}\naccuracy: {avg_accuracy}\n')
 
     return avg_dim, avg_precision, avg_recall, avg_f1, avg_accuracy
+
+
+def get_cross_val_data(fold, idx, train_data):
+    """Separates the original train data into train data and val data for one round in cross validation
+
+    :param fold: Number of folds for cross validation
+    :param idx: Index of the current round
+    :param train_data: Original train data
+    :return: X, Y of train data and val data
+    """
+    # Calculate the number of data per fold
+    num_total = train_data[0].shape[0]
+    num_per_fold = math.ceil(num_total / fold)
+
+    # If the selected val set is not the last fold
+    if idx != fold - 1:
+        val_x = train_data[0][idx * num_per_fold:(idx + 1) * num_per_fold]
+        val_y = train_data[1][idx * num_per_fold:(idx + 1) * num_per_fold]
+        train_x = torch.cat((train_data[0][:idx * num_per_fold], train_data[0][(idx + 1) * num_per_fold:]), 0)
+        train_y = torch.cat((train_data[1][:idx * num_per_fold], train_data[1][(idx + 1) * num_per_fold:]), 0)
+    # If the selected val set is the last fold
+    else:
+        val_x = train_data[0][idx * num_per_fold:]
+        val_y = train_data[1][idx * num_per_fold:]
+        train_x = train_data[0][:idx * num_per_fold]
+        train_y = train_data[1][:idx * num_per_fold]
+
+    return train_x, train_y, val_x, val_y
 
 
 def train_eval_svm(clf, train_x, train_y, test_x, test_y):
@@ -152,7 +165,7 @@ def val_linear_svm(amounts, fold, train_data):
 
     # Iterate through the selected dimensions and do cross validation
     for amount in amounts:
-        dim, precision, recall, f1, accuracy = cross_val_pca(amount, fold, train_data)
+        dim, precision, recall, f1, accuracy = cross_val_linear_svm(amount, fold, train_data)
 
         # Record the values of metrics for this selected amount
         precision_lst.append(precision)
