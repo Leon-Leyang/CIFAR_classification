@@ -192,11 +192,11 @@ def train_eval_svm(clf, train_x, train_y, test_x, test_y):
     return precision, recall, f1, accuracy
 
 
-def val_linear_svm(amounts, fold, train_data):
+def val_linear_svm(amount_lst, fold, train_data):
     """Evaluates performances of a series of linear SVMs trained on dimension-variant features
 
     The evaluation will be done on the val set.
-    :param amounts: List of different amounts of variance that needs to be explained
+    :param amount_lst: List of different amounts of variance that needs to be explained
     :param fold: Number of folds for cross validation
     :param train_data: Train data
     """
@@ -210,7 +210,7 @@ def val_linear_svm(amounts, fold, train_data):
     dim_lst = []
 
     # Iterate through the selected dimensions and do cross validation
-    for amount in amounts:
+    for amount in amount_lst:
         dim, precision, recall, f1, accuracy = cross_val_linear_svm(amount, fold, train_data)
 
         # Record the values of metrics for this selected amount
@@ -223,14 +223,14 @@ def val_linear_svm(amounts, fold, train_data):
         dim_lst.append(dim)
 
     # Plot and save the result
-    plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
+    plot_result('dimension', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
-def test_linear_svm(amounts, train_data, test_data):
+def test_linear_svm(amount_lst, train_data, test_data):
     """Evaluates performances of a series of linear SVMs trained on dimension-variant features
 
     The evaluation will be done on the test set.
-    :param amounts: List of different amounts of variance that needs to be explained
+    :param amount_lst: List of different amounts of variance that needs to be explained
     :param train_data: Train data
     :param train_data: Test data
     """
@@ -246,7 +246,7 @@ def test_linear_svm(amounts, train_data, test_data):
     # Init a SVM
     clf = svm.SVC(kernel='linear')
 
-    for amount in amounts:
+    for amount in amount_lst:
         train_x = train_data[0]
         train_y = train_data[1]
         test_x = test_data[0]
@@ -270,7 +270,35 @@ def test_linear_svm(amounts, train_data, test_data):
         print(f'Amount: {amount}, Dimension: {dim}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
 
     # Plot and save the result
-    plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+    plot_result('dimension', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+
+
+def val_rbf_svm(c_lst, fold, train_data):
+    """Evaluates performances of a series of non-linear SVMs with RGF kernal
+
+    The evaluation will be done on the val set.
+    :param c_lst: List of different values of the regularization parameter C
+    :param fold: Number of folds for cross validation
+    :param train_data: Train data
+    """
+    # Lists that store the values of metrics for each selected C
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    # Iterate through the selected dimensions and do cross validation
+    for c in c_lst:
+        precision, recall, f1, accuracy = cross_val_rbf_svm(c, fold, train_data)
+
+        # Record the values of metrics for this selected amount
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+
+    # Plot and save the result
+    plot_result('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
 if __name__ == '__main__':
@@ -282,9 +310,11 @@ if __name__ == '__main__':
     end_amount = 1.001
     step = 0.01
 
-    amounts = np.arange(start_amount, end_amount, step)
+    amount_lst = np.arange(start_amount, end_amount, step)
     fold = 5
-    # val_linear_svm(amounts, 5, train_data)
-    # test_linear_svm(amounts, train_data, test_data)
+    # val_linear_svm(amount_lst, 5, train_data)
+    # test_linear_svm(amount_lst, train_data, test_data)
 
-    cross_val_rbf_svm(10, 5, train_data)
+    # cross_val_rbf_svm(10, 5, train_data)
+    c_lst = [5, 10]
+    val_rbf_svm(c_lst, 5, train_data)

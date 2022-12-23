@@ -81,12 +81,13 @@ def get_data_once(loader, size):
     return data
 
 
-def plot_multi_line(metric_name, metric_lst, dims, test):
+def plot_multi_line(hyper_param_name, metric_name, metric_lst, dims, test):
     """Plots and saves a line chart with multiple lines, where x-axis takes the names of classes and each metric value
     in metric_lst corresponds to a line
 
-    Save the plot in a file whose name follows the format: dims-metric_name-phase.png.
-    For example: 3072_2000_1000-precision-test.png
+    Save the plot in a file whose name follows the format: param_name-param_str-metric_name-phase.png.
+    For example: dim-3072_2000_1000-precision-test.png
+    :param hyper_param_name: The name of the hyperparameter
     :param metric_name: Name of the metric
     :param metric_lst: List of the metric value
     :param dims: Dimensions corresponding to metric values
@@ -116,14 +117,16 @@ def plot_multi_line(metric_name, metric_lst, dims, test):
     root_dir = get_root_dir()
     if not(os.path.exists(f'{root_dir}/result')):
         os.makedirs(f'{root_dir}/result')
-    plt.savefig(f'{root_dir}/result/{dim_str}-{metric_name}-{phase}.png')
+    plt.savefig(f'{root_dir}/result/{hyper_param_name}-{dim_str}-{metric_name}-{phase}.png')
 
 
-def plot_single_line(accuracy_lst, dims, test):
-    """Plots a line chart with a single line, where x-axis takes the dimensions
+def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
+    """Plots and save a line chart with a single line, where x-axis takes the hyperparameters
 
+    The naming rule of the file is the same as `plot_multi_line`.
+    :param hyper_param_name: The name of the hyperparameter
+    :param hyper_param_lst: Hyperparameters corresponding to accuracy values
     :param accuracy_lst: List of the accuracy value
-    :param dims: Dimensions corresponding to accuracy values
     :param test: If this plot is generated during test or validation
     """
     # Clear the previous content
@@ -131,32 +134,33 @@ def plot_single_line(accuracy_lst, dims, test):
     plt.cla()
 
     # Plot the accuracy
-    plt.plot(dims, accuracy_lst, marker='o')
+    plt.plot(hyper_param_lst, accuracy_lst, marker='o')
 
-    plt.xlabel('dimension')
+    plt.xlabel(hyper_param_name)
     plt.ylabel('accuracy')
 
     # Save the plot
     phase = 'test' if test else 'val'
-    dim_str = '_'.join([str(x) for x in dims])
+    hyper_param_str = '_'.join([str(x) for x in hyper_param_lst])
     root_dir = get_root_dir()
-    plt.savefig(f'{root_dir}/result/{dim_str}-accuracy-{phase}.png')
+    plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-accuracy-{phase}.png')
 
 
-def plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, test):
+def plot_result(hyper_param_name, hyper_param_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, test):
     """Plots and saves the result
 
-    :param dim_lst: List of numbers of dimensions used in PCA
+    :param hyper_param_name: The name of the hyperparameter
+    :param hyper_param_lst: List of the hyperparameters
     :param precision_lst: List of the precision value
     :param recall_lst: List of the recall value
     :param f1_lst: List of the f1 value
     :param accuracy_lst: List of the accuracy value
     :param test: If this plot is generated during test or validation
     """
-    plot_multi_line('precision', precision_lst, dim_lst, test)
-    plot_multi_line('recall', recall_lst, dim_lst, test)
-    plot_multi_line('f1', f1_lst, dim_lst, test)
-    plot_single_line(accuracy_lst, dim_lst, test)
+    plot_multi_line(hyper_param_name, 'precision', precision_lst, hyper_param_lst, test)
+    plot_multi_line(hyper_param_name, 'recall', recall_lst, hyper_param_lst, test)
+    plot_multi_line(hyper_param_name, 'f1', f1_lst, hyper_param_lst, test)
+    plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test)
 
 
 if __name__ == '__main__':
