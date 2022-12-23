@@ -57,7 +57,7 @@ def cross_val_linear_svm(amount, fold, train_data):
     # List that stores the number of dimensions used in each round
     dim_lst = []
 
-    # Init a SVM
+    # Init a linear SVM
     clf = svm.SVC(kernel='linear')
 
     # Cross validation
@@ -93,6 +93,52 @@ def cross_val_linear_svm(amount, fold, train_data):
     print(f'Amount: {amount}, Dimension: {avg_dim}\nprecision: {avg_precision}\nrecall: {avg_recall}\nf1: {avg_f1}\naccuracy: {avg_accuracy}\n')
 
     return avg_dim, avg_precision, avg_recall, avg_f1, avg_accuracy
+
+
+def cross_val_rbf_svm(c, fold, train_data):
+    """Cross validation for a non-linear SVM with RGF kernal
+
+    :param c: Regularization parameter for the SVM
+    :param fold: Number of folds in cross validation
+    :param train_data: Train data, a list of two tensors in which the first's shape is B*C*H*W and the second is B
+    :return: Average precision, recall, f1 values (for each class) and accuracy of the SVM
+    """
+    # Lists that store the values of metrics in each round
+    precision_lst = []
+    recall_lst = []
+    f1_lst = []
+    accuracy_lst = []
+
+    # Init a non-linear SVM with RBF kernal
+    clf = svm.SVC(C=c)
+
+    # Cross validation
+    for idx in range(fold):
+        # Get the train data and val data for this round
+        train_x, train_y, val_x, val_y = get_cross_val_data(fold, idx, train_data)
+
+        # Flatten the data of shape B*C*H*W to B*(C*H*W)
+        train_x, val_x = torch.flatten(train_x, start_dim=1), torch.flatten(val_x, start_dim=1)
+
+        # Train and evaluate the SVM
+        precision, recall, f1, accuracy = train_eval_svm(clf, train_x, train_y, val_x, val_y)
+
+        # Record the values of metrics in this round
+        precision_lst.append(precision)
+        recall_lst.append(recall)
+        f1_lst.append(f1)
+        accuracy_lst.append(accuracy)
+        # print(f'Round {idx + 1}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
+
+    # Calculate average values of metrics in all rounds
+    avg_precision = np.mean(precision_lst, axis=0)
+    avg_recall = np.mean(recall_lst, axis=0)
+    avg_f1 = np.mean(f1_lst, axis=0)
+    avg_accuracy = np.mean(accuracy_lst, axis=0)
+
+    print(f'C: {c}\nprecision: {avg_precision}\nrecall: {avg_recall}\nf1: {avg_f1}\naccuracy: {avg_accuracy}\n')
+
+    return avg_precision, avg_recall, avg_f1, avg_accuracy
 
 
 def get_cross_val_data(fold, idx, train_data):
@@ -238,5 +284,7 @@ if __name__ == '__main__':
 
     amounts = np.arange(start_amount, end_amount, step)
     fold = 5
-    val_linear_svm(amounts, 5, train_data)
+    # val_linear_svm(amounts, 5, train_data)
     # test_linear_svm(amounts, train_data, test_data)
+
+    cross_val_rbf_svm(10, 5, train_data)
