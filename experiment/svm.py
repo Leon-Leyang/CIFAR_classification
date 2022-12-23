@@ -208,6 +208,8 @@ def test_linear_svm(amounts, train_data, test_data):
         # Record the number of dimensions used in PCA for this selected amount
         dim_lst.append(dim)
 
+        print(f'Amount: {amount}, Dimension: {dim}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
+
     # Plot and save the result
     plot_result(dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
 
@@ -217,7 +219,7 @@ if __name__ == '__main__':
     train_data = get_data_once(train_loader, 5000)
     test_data = get_data_once(test_loader, -1)
 
-    start_amount = 0.98
+    start_amount = 1
     end_amount = 1.001
     step = 0.01
 

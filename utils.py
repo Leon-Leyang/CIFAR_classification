@@ -4,9 +4,6 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
-# import matplotlib
-# matplotlib.use('TkAgg')
-
 
 def get_root_dir():
     """Gets the root path of the current project
