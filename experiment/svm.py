@@ -357,6 +357,6 @@ if __name__ == '__main__':
     # test_linear_svm(amount_lst, train_data, test_data)
 
     # cross_val_rbf_svm(10, 5, train_data)
-    c_lst = [5, 10]
-    # val_rbf_svm(c_lst, 5, train_data)
-    test_rbf_svm(c_lst, train_data, test_data)
+    c_lst = np.logspace(-5, 5, 11)
+    val_rbf_svm(c_lst, 5, train_data)
+    # test_rbf_svm(c_lst, train_data, test_data)
