@@ -113,8 +113,11 @@ def plot_multi_line(hyper_param_name, metric_name, metric_lst, hyper_param_lst, 
 
     # Save the plot
     phase = 'test' if test else 'val'
-    hyper_param_str = '_'.join([str(x) for x in hyper_param_lst])
-    # hyper_param_str = '0.2_0.4_0.6_0.8_1.0_1.2_1.4_1.6_1.8_2.0_2.2_2.4_2.6_2.8_3.0_3.2_3.4_3.6_3.8_4.0'
+    # Build the hyper_param_str differently according to the type of the hyperparameter
+    # Avoid converting a float such as 0.3 to str '0.30000000001'
+    hyper_param_str = '_'.join(
+        [str(x) for x in hyper_param_lst] if isinstance(hyper_param_lst[0], int) else [f'{x:.2f}' for x in
+                                                                                       hyper_param_lst])
     root_dir = get_root_dir()
     if not(os.path.exists(f'{root_dir}/result')):
         os.makedirs(f'{root_dir}/result')
@@ -142,8 +145,11 @@ def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
 
     # Save the plot
     phase = 'test' if test else 'val'
-    hyper_param_str = '_'.join([str(x) for x in hyper_param_lst])
-    # hyper_param_str = '0.2_0.4_0.6_0.8_1.0_1.2_1.4_1.6_1.8_2.0_2.2_2.4_2.6_2.8_3.0_3.2_3.4_3.6_3.8_4.0'
+    # Build the hyper_param_str differently according to the type of the hyperparameter
+    # Avoid converting a float such as 0.3 to str '0.30000000001'
+    hyper_param_str = '_'.join(
+        [str(x) for x in hyper_param_lst] if isinstance(hyper_param_lst[0], int) else [f'{x:.2f}' for x in
+                                                                                       hyper_param_lst])
     root_dir = get_root_dir()
     plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-accuracy-{phase}.png')
 

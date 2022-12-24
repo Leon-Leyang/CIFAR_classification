@@ -358,6 +358,6 @@ if __name__ == '__main__':
 
     # cross_val_rbf_svm(10, 5, train_data)
     # c_lst = np.logspace(-5, 5, 11)
-    c_lst = np.arange(0.2, 4.01, 0.2)
+    c_lst = np.arange(1, 80, 4)
     val_rbf_svm(c_lst, 5, train_data)
     # test_rbf_svm(c_lst, train_data, test_data)
