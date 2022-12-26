@@ -6,7 +6,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-from utils import init_loader, get_data_once, plot_result
+from utils import init_loader, plot_result
 
 
 def apply_pca(amount, train_x, test_x):
@@ -344,8 +344,8 @@ def test_rbf_svm(c_lst, train_data, test_data):
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
-    train_data = get_data_once(train_loader, 5000)
-    test_data = get_data_once(test_loader, -1)
+    train_data = next(iter(train_loader))
+    test_data = next(iter(test_loader))
 
     start_amount = 1
     end_amount = 1.001

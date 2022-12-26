@@ -67,24 +67,6 @@ def init_loader(batch_size=16, full=False):
     return train_loader, test_loader
 
 
-def get_data_once(loader, size):
-    """Gets a number of data from the loader at once
-
-    If the size is -1, all data in the data loader will be returned.
-    :param loader: Data loader
-    :param size: Size of the returned data
-    :return: The data of the specified size
-    """
-    # Get a generator from the loader
-    data = next(iter(loader))
-
-    # If size is not -1, slice the data to the specified size
-    if size != -1:
-        data = [data[0][:size], data[1][:size]]
-
-    return data
-
-
 def plot_multi_line(hyper_param_name, metric_name, metric_lst, hyper_param_lst, test):
     """Plots and saves a line chart with multiple lines, where x-axis takes the names of classes and each metric value
     in metric_lst corresponds to a line
@@ -174,4 +156,5 @@ def plot_result(hyper_param_name, hyper_param_lst, precision_lst, recall_lst, f1
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)
-    train_data = get_data_once(train_loader, 5000)
+    train_data = next(iter(train_loader))
+    test_data = next(iter(test_loader))
