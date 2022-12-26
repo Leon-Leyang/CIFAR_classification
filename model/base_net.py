@@ -4,6 +4,10 @@ import torch.nn.functional as F
 
 
 class BaseNet(nn.Module):
+    """CLass for the baseline model
+
+    2 Conv layers + 3 FC layers
+    """
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
