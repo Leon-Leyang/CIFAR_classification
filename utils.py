@@ -5,6 +5,11 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
 
+# Fix the seed so that the data from each run stays the same
+seed = 10
+torch.manual_seed(seed)
+
+
 def get_root_dir():
     """Gets the root path of the current project
 
@@ -45,6 +50,9 @@ def init_loader(batch_size=16, full=False):
     test_set = torchvision.datasets.CIFAR10(root=f'{root_dir}/data', train=False,
                                             download=True, transform=transform)
 
+    # Use first 5000 pieces of data as train set
+    train_set = torch.utils.data.Subset(train_set, list(range(5000)))
+
     if not full:
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                                    shuffle=True, num_workers=2)
@@ -67,10 +75,6 @@ def get_data_once(loader, size):
     :param size: Size of the returned data
     :return: The data of the specified size
     """
-    # Fix the seed so that the data from each run stays the same
-    seed = 10
-    torch.manual_seed(seed)
-
     # Get a generator from the loader
     data = next(iter(loader))
 
