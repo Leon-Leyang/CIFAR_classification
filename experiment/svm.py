@@ -223,7 +223,7 @@ def val_linear_svm(amount_lst, fold, train_data):
         dim_lst.append(dim)
 
     # Plot and save the result
-    plot_result('dimension', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
+    plot_result('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
 def test_linear_svm(amount_lst, train_data, test_data):
@@ -270,7 +270,7 @@ def test_linear_svm(amount_lst, train_data, test_data):
         print(f'Amount: {amount}, Dimension: {dim}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
 
     # Plot and save the result
-    plot_result('dimension', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+    plot_result('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
 
 
 def val_rbf_svm(c_lst, fold, train_data):
@@ -347,17 +347,17 @@ if __name__ == '__main__':
     train_data = next(iter(train_loader))
     test_data = next(iter(test_loader))
 
-    start_amount = 1
+    start_amount = 0.7
     end_amount = 1.001
     step = 0.01
 
     amount_lst = np.arange(start_amount, end_amount, step)
     fold = 5
-    # val_linear_svm(amount_lst, 5, train_data)
+    val_linear_svm(amount_lst, 5, train_data)
     # test_linear_svm(amount_lst, train_data, test_data)
 
     # cross_val_rbf_svm(10, 5, train_data)
     # c_lst = np.logspace(-5, 5, 11)
-    c_lst = np.arange(1, 80, 4)
-    val_rbf_svm(c_lst, 5, train_data)
+    # c_lst = np.arange(1, 80, 4)
+    # val_rbf_svm(c_lst, 5, train_data)
     # test_rbf_svm(c_lst, train_data, test_data)

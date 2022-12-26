@@ -5,6 +5,10 @@ from model.base_net import BaseNet
 from utils import init_loader
 
 
+# Check if cuda is available
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 def train(model, train_loader, epoch, lr, weight_decay=0.001):
     """Trains and saves a model
 
@@ -21,6 +25,8 @@ def train(model, train_loader, epoch, lr, weight_decay=0.001):
     # Init the loss function
     criterion = nn.CrossEntropyLoss()
 
+    batch = len(train_loader)
+
     # Iterate the training
     for e in range(epoch):
         model.train()
@@ -28,6 +34,7 @@ def train(model, train_loader, epoch, lr, weight_decay=0.001):
         # Train with each batch
         for i, data in enumerate(train_loader):
             inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
 
             # Refresh the gradients
             optimizer.zero_grad()
@@ -38,8 +45,9 @@ def train(model, train_loader, epoch, lr, weight_decay=0.001):
             loss.backward()
             optimizer.step()
 
-            # print(f'epoch {e + 1}/{epoch}')
+            print(f'epoch {e + 1}/{epoch}, batch {i + 1}/{batch}, loss: {loss:.4f}')
 
+    return model
 
 
 def test(model, test_loader):
@@ -50,7 +58,7 @@ if __name__ == '__main__':
     batch_size = 64
     train_loader, test_loader = init_loader(64)
 
-    model = BaseNet()
+    model = BaseNet().to(device)
 
     epoch = 10
 
