@@ -347,17 +347,17 @@ if __name__ == '__main__':
     train_data = next(iter(train_loader))
     test_data = next(iter(test_loader))
 
-    start_amount = 0.7
-    end_amount = 1.001
-    step = 0.01
-
-    amount_lst = np.arange(start_amount, end_amount, step)
-    fold = 5
-    val_linear_svm(amount_lst, 5, train_data)
+    # start_amount = 0.7
+    # end_amount = 1.001
+    # step = 0.01
+    # amount_lst = np.arange(start_amount, end_amount, step)
+    # amount_lst = [0.77, 0.78, 0.8, 0.81, 0.82, 1]
+    # fold = 5
+    # val_linear_svm(amount_lst, 5, train_data)
     # test_linear_svm(amount_lst, train_data, test_data)
 
-    # cross_val_rbf_svm(10, 5, train_data)
     # c_lst = np.logspace(-5, 5, 11)
-    # c_lst = np.arange(1, 80, 4)
+    # c_lst = np.arange(2, 4.501, 0.1)
+    c_lst = [2.4, 2.5, 2.6, 3.5, 3.6]
     # val_rbf_svm(c_lst, 5, train_data)
-    # test_rbf_svm(c_lst, train_data, test_data)
+    test_rbf_svm(c_lst, train_data, test_data)
