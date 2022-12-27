@@ -4,6 +4,8 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
+from matplotlib.pyplot import MultipleLocator
+
 
 # Fix the seed so that the data from each run stays the same
 seed = 10
@@ -154,8 +156,88 @@ def plot_result_svm(hyper_param_name, hyper_param_lst, precision_lst, recall_lst
     plot_accuracy_svm(hyper_param_name, hyper_param_lst, accuracy_lst, test)
 
 
-def plot_other_metric_cnn():
-    pass
+def plot_other_metric_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst):
+    """Plots and saves a line chart for CNN experiment with three lines, where one line for precision, one for recall and
+    the other one for f1
+
+    :param model_name: Name of the model
+    :param epoch: Total number of epochs
+    :param lr: Learning rate
+    :param weight_decay: Weight decay
+    :param precision_lst: List of the precision value
+    :param recall_lst: List of the recall value
+    :param f1_lst: List of the f1 value
+    """
+    # Clear the previous content
+    plt.clf()
+    plt.cla()
+
+    # Get the class names
+    cls_lst = get_cls_name()
+    x = range(len(cls_lst))
+
+    # Plot the metrics
+    plt.plot(x, precision_lst, marker='o', label='precision')
+    plt.plot(x, recall_lst, marker='o', label='recall')
+    plt.plot(x, f1_lst, marker='o', label='f1')
+
+    # Show the legend
+    plt.legend()
+    # Show class names on the x-axis
+    plt.xticks(x, cls_lst, rotation=45)
+
+    # Save the plot
+    root_dir = get_root_dir()
+    plt.savefig(f'{root_dir}/result/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}-others.png')
+
+
+def plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst):
+    """Plots and saves a line chart for CNN experiment with two lines, where one line for train set accuracy and
+    the other test set
+
+    :param model_name: Name of the model
+    :param epoch: Total number of epochs
+    :param lr: Learning rate
+    :param weight_decay: Weight decay
+    :param accuracy_lst: List of accuracy, where the first element is the train set accuracy and the second test set
+    """
+    # Clear the previous content
+    plt.clf()
+    plt.cla()
+
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+
+    # Plot the accuracy
+    epoch_lst = list(range(1, epoch + 1))
+    train_accuracy_lst, test_accuracy_lst = accuracy_lst
+    plt.plot(epoch_lst, train_accuracy_lst, marker='o', label='train')
+    plt.plot(epoch_lst, test_accuracy_lst, marker='o', label='test')
+
+    # Show the legend
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('accuracy')
+
+    # Save the plot
+    root_dir = get_root_dir()
+    plt.savefig(f'{root_dir}/result/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}-accuracy.png')
+
+
+def plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst):
+    """Plots and saves the result for CNN experiment
+
+    :param model_name: Name of the model
+    :param epoch: Total number of epochs
+    :param lr: Learning rate
+    :param weight_decay: Weight decay
+    :param precision_lst: List of the precision value
+    :param recall_lst: List of the recall value
+    :param f1_lst: List of the f1 value
+    :param accuracy_lst: List of accuracy, where the first element is the train set accuracy and the second test set
+    """
+    plot_other_metric_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst)
+    plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst)
 
 
 if __name__ == '__main__':

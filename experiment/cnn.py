@@ -3,7 +3,7 @@ import torch.nn as nn
 import os
 
 from model.base_net import BaseNet
-from utils import init_loader, get_root_dir
+from utils import init_loader, get_root_dir, plot_result_cnn
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
@@ -35,6 +35,9 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
 
     batch = len(train_loader)
     model_name = model.__class__.__name__
+
+    # List to store the accuracy of the model on train set and test set in each epoch
+    accuracy_lst = [[], []]
 
     # Iterate the training
     for e in range(epoch):
@@ -69,15 +72,23 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
         test_accuracy = evaluate(model, test_loader, ['accuracy'])[0]
         print(f'epoch {e + 1}/{epoch}, train_accuracy: {train_accuracy}, test_accuracy: {test_accuracy}')
 
+        # Record the accuracy
+        accuracy_lst[0].append(train_accuracy)
+        accuracy_lst[1].append(test_accuracy)
+
     print('\nFinish training\n')
 
     # Evaluates other metrics of the final model
-    precision, recall, f1 = evaluate(model, test_loader, ['precision', 'recall', 'f1'])
-    print(f'precision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {test_accuracy}\n')
+    metric_lst = evaluate(model, test_loader, ['precision', 'recall', 'f1'])
+    precision_lst, recall_lst, f1_lst = metric_lst
+    print(f'precision: {precision_lst}\nrecall: {recall_lst}\nf1: {f1_lst}\naccuracy: {test_accuracy}\n')
 
     # Save the model
     root_dir = get_root_dir()
-    torch.save(model.state_dict(), f'{root_dir}/checkpoint/{model_name}_ep{epoch}_lr{lr}_wd{weight_decay}.pt')
+    torch.save(model.state_dict(), f'{root_dir}/checkpoint/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}.pt')
+
+    # Plot and save the result
+    plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst)
 
 
 def evaluate(model, test_loader, metric_lst):
@@ -118,7 +129,6 @@ def evaluate(model, test_loader, metric_lst):
             value = func(gt_lst, pred_lst)
         else:
             value = func(gt_lst, pred_lst, average=None)
-
         ret_lst.append(value)
     return ret_lst
 
