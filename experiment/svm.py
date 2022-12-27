@@ -6,7 +6,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
-from utils import init_loader, plot_result
+from utils import init_loader, plot_result_svm
 
 
 def apply_pca(amount, train_x, test_x):
@@ -223,7 +223,7 @@ def val_linear_svm(amount_lst, fold, train_data):
         dim_lst.append(dim)
 
     # Plot and save the result
-    plot_result('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
+    plot_result_svm('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
 def test_linear_svm(amount_lst, train_data, test_data):
@@ -270,7 +270,7 @@ def test_linear_svm(amount_lst, train_data, test_data):
         print(f'Amount: {amount}, Dimension: {dim}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
 
     # Plot and save the result
-    plot_result('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+    plot_result_svm('dim', dim_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
 
 
 def val_rbf_svm(c_lst, fold, train_data):
@@ -298,7 +298,7 @@ def val_rbf_svm(c_lst, fold, train_data):
         accuracy_lst.append(accuracy)
 
     # Plot and save the result
-    plot_result('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
+    plot_result_svm('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, False)
 
 
 def test_rbf_svm(c_lst, train_data, test_data):
@@ -339,7 +339,7 @@ def test_rbf_svm(c_lst, train_data, test_data):
         print(f'C: {c}\nprecision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {accuracy}\n')
 
     # Plot and save the result
-    plot_result('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
+    plot_result_svm('c', c_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, True)
 
 
 if __name__ == '__main__':

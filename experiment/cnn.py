@@ -3,7 +3,7 @@ import torch.nn as nn
 import os
 
 from model.base_net import BaseNet
-from utils import init_loader
+from utils import init_loader, get_root_dir
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
@@ -34,6 +34,7 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     criterion = nn.CrossEntropyLoss()
 
     batch = len(train_loader)
+    model_name = model.__class__.__name__
 
     # Iterate the training
     for e in range(epoch):
@@ -65,17 +66,21 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
 
         # Evaluates the model's accuracy on the train set and test set in this epoch
         train_accuracy = accuracy_score(gt_lst, pred_lst)
-        test_accuracy = eval(model, test_loader, ['accuracy'])[0]
+        test_accuracy = evaluate(model, test_loader, ['accuracy'])[0]
         print(f'epoch {e + 1}/{epoch}, train_accuracy: {train_accuracy}, test_accuracy: {test_accuracy}')
 
     print('\nFinish training\n')
 
     # Evaluates other metrics of the final model
-    precision, recall, f1 = eval(model, test_loader, ['precision', 'recall', 'f1'])
+    precision, recall, f1 = evaluate(model, test_loader, ['precision', 'recall', 'f1'])
     print(f'precision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {test_accuracy}\n')
 
+    # Save the model
+    root_dir = get_root_dir()
+    torch.save(model.state_dict(), f'{root_dir}/checkpoint/{model_name}_ep{epoch}_lr{lr}_wd{weight_decay}.pt')
 
-def eval(model, test_loader, metric_lst):
+
+def evaluate(model, test_loader, metric_lst):
     """Evaluates a model on test set
 
     :param model: The model to be evaluated

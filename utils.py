@@ -67,8 +67,8 @@ def init_loader(batch_size=16, full=False):
     return train_loader, test_loader
 
 
-def plot_multi_line(hyper_param_name, metric_name, metric_lst, hyper_param_lst, test):
-    """Plots and saves a line chart with multiple lines, where x-axis takes the names of classes and each metric value
+def plot_other_metric_svm(hyper_param_name, metric_name, metric_lst, hyper_param_lst, test):
+    """Plots and saves a line chart for SVM experiment with multiple lines, where x-axis takes the names of classes and each metric value
     in metric_lst corresponds to a line
 
     Save the plot in a file whose name follows the format: param_name-param_str-metric_name-phase.png.
@@ -109,8 +109,8 @@ def plot_multi_line(hyper_param_name, metric_name, metric_lst, hyper_param_lst, 
     plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-{metric_name}-{phase}.png')
 
 
-def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
-    """Plots and save a line chart with a single line, where x-axis takes the hyperparameters
+def plot_accuracy_svm(hyper_param_name, hyper_param_lst, accuracy_lst, test):
+    """Plots and save a line chart for accuracy of SVM experiment with a single line, where x-axis takes the hyperparameters
 
     The naming rule of the file is the same as `plot_multi_line`.
     :param hyper_param_name: The name of the hyperparameter
@@ -137,8 +137,8 @@ def plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test):
     plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-accuracy-{phase}.png')
 
 
-def plot_result(hyper_param_name, hyper_param_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, test):
-    """Plots and saves the result
+def plot_result_svm(hyper_param_name, hyper_param_lst, precision_lst, recall_lst, f1_lst, accuracy_lst, test):
+    """Plots and saves the result for SVM experiment
 
     :param hyper_param_name: The name of the hyperparameter
     :param hyper_param_lst: List of the hyperparameters
@@ -148,10 +148,14 @@ def plot_result(hyper_param_name, hyper_param_lst, precision_lst, recall_lst, f1
     :param accuracy_lst: List of the accuracy value
     :param test: If this plot is generated during test or validation
     """
-    plot_multi_line(hyper_param_name, 'precision', precision_lst, hyper_param_lst, test)
-    plot_multi_line(hyper_param_name, 'recall', recall_lst, hyper_param_lst, test)
-    plot_multi_line(hyper_param_name, 'f1', f1_lst, hyper_param_lst, test)
-    plot_single_line(hyper_param_name, hyper_param_lst, accuracy_lst, test)
+    plot_other_metric_svm(hyper_param_name, 'precision', precision_lst, hyper_param_lst, test)
+    plot_other_metric_svm(hyper_param_name, 'recall', recall_lst, hyper_param_lst, test)
+    plot_other_metric_svm(hyper_param_name, 'f1', f1_lst, hyper_param_lst, test)
+    plot_accuracy_svm(hyper_param_name, hyper_param_lst, accuracy_lst, test)
+
+
+def plot_other_metric_cnn():
+    pass
 
 
 if __name__ == '__main__':
