@@ -26,7 +26,6 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     :param epoch: Number of training epochs
     :param lr: Learning rate
     :param weight_decay: Weight decay
-    :return: The trained model
     """
     # Init an optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -66,20 +65,30 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
 
         # Evaluates the model's accuracy on the train set and test set in this epoch
         train_accuracy = accuracy_score(gt_lst, pred_lst)
-        test_accuracy = eval_accuracy(model, test_loader)
+        test_accuracy = eval(model, test_loader, ['accuracy'])[0]
         print(f'epoch {e + 1}/{epoch}, train_accuracy: {train_accuracy}, test_accuracy: {test_accuracy}')
 
-    return model
+    print('\nFinish training\n')
+
+    # Evaluates other metrics of the final model
+    precision, recall, f1 = eval(model, test_loader, ['precision', 'recall', 'f1'])
+    print(f'precision: {precision}\nrecall: {recall}\nf1: {f1}\naccuracy: {test_accuracy}\n')
 
 
-def eval_accuracy(model, test_loader):
-    """Evaluates a model's accuracy on test set
+def eval(model, test_loader, metric_lst):
+    """Evaluates a model on test set
 
     :param model: The model to be evaluated
     :param test_loader: Data loader for the test set
-    :return: The model's accuracy on the test set
+    :return: A list to store the return result
     """
-    # Lists for storing all ground truth labels and predictions for later accuracy evaluation
+    # Store the mapping from metric name to function
+    name_2_func = {'precision': precision_score, 'recall': recall_score, 'f1': f1_score, 'accuracy': accuracy_score}
+
+    # Return list
+    ret_lst = []
+
+    # Lists for storing all ground truth labels and predictions for later evaluation
     gt_lst = []
     pred_lst = []
 
@@ -92,30 +101,27 @@ def eval_accuracy(model, test_loader):
             # Forward
             outputs = model(inputs)
 
+            # Record the ground truth labels and predictions
             gt_lst += labels.tolist()
             _, preds = torch.max(outputs, 1)
             pred_lst += preds.tolist()
 
-        test_accuracy = accuracy_score(gt_lst, pred_lst)
-        return test_accuracy
+    # Iterate through each metric
+    for name in metric_lst:
+        func = name_2_func[name]
+        if name == 'accuracy':
+            value = func(gt_lst, pred_lst)
+        else:
+            value = func(gt_lst, pred_lst, average=None)
 
-
-def eval_other_metric(model, test_loader):
-    """Evaluates a model's precision, recall and f1 values (for each class) on test set
-
-    :param model:
-    :param test_loader:
-    :return:
-    """
-    pass
+        ret_lst.append(value)
+    return ret_lst
 
 
 if __name__ == '__main__':
     batch_size = 64
     train_loader, test_loader = init_loader(64)
-
     model = BaseNet().to(device)
+    epoch = 5
 
-    epoch = 10
-
-    model = train(model, train_loader, test_loader, epoch)
+    train(model, train_loader, test_loader, epoch)
