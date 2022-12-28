@@ -6,16 +6,22 @@ class BasicBlock(nn.Module):
     """Basic block that cascades two convolution operations and a max pooling operation in sequence
 
     """
-    def __init__(self, in_channels, out_channels, kernal_size):
+    def __init__(self, in_channels, out_channels, kernel_size):
+        """Inits a basic block
+
+        :param in_channels: The number of input channels
+        :param out_channels: The number of output channels
+        :param kernel_size: The size of the kernel
+        """
         super().__init__()
 
         # Calculate the value of the padding to keep the height and width unchanged
-        padding = int((kernal_size - 1) / 2)
+        padding = int((kernel_size - 1) / 2)
 
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernal_size, padding=padding)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU()
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernal_size, padding=padding)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size, padding=padding)
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.pool = nn.MaxPool2d(2, 2)
 
@@ -31,15 +37,19 @@ class BasicBlock(nn.Module):
 
 
 class BasicNet(nn.Module):
-    """Basic cn that cascades three basic blocks and three dense layers in sequence
+    """Basic cnn that cascades three basic blocks and three dense layers in sequence
 
     """
-    def __init__(self):
+    def __init__(self, kernel_size):
+        """Inits a basic cnn
+
+        :param kernel_size: The size of the kernel in `BasicBlock`
+        """
         super().__init__()
-        self.layer1 = BasicBlock(3, 32, 3)
+        self.layer1 = BasicBlock(3, 32, kernel_size)
         self.dropout = nn.Dropout()
-        self.layer2 = BasicBlock(32, 64, 3)
-        self.layer3 = BasicBlock(64, 128, 3)
+        self.layer2 = BasicBlock(32, 64, kernel_size)
+        self.layer3 = BasicBlock(64, 128, kernel_size)
         self.fc1 = nn.Linear(128 * 4 * 4, 120)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(120, 84)
