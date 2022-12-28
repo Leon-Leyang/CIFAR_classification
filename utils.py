@@ -4,7 +4,7 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
-from matplotlib.pyplot import MultipleLocator
+from matplotlib.pyplot import MaxNLocator
 
 
 # Fix the seed so that the data from each run stays the same
@@ -207,8 +207,7 @@ def plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst):
     plt.clf()
     plt.cla()
 
-    ax = plt.gca()
-    ax.xaxis.set_major_locator(MultipleLocator(1))
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Plot the accuracy
     epoch_lst = list(range(1, epoch + 1))
