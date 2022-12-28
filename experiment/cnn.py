@@ -141,6 +141,6 @@ if __name__ == '__main__':
     train_loader, test_loader = init_loader(batch_size)
     model = BasicNet().to(device)
     epoch = 20
-    weight_decay = 0
+    weight_decay = 0.001
 
-    train(model, train_loader, test_loader, epoch, weight_decay=0)
+    train(model, train_loader, test_loader, epoch, weight_decay=weight_decay)
