@@ -85,6 +85,9 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
 
     # Save the model
     root_dir = get_root_dir()
+    # Ensure the path `/checkpoint` exists
+    if not (os.path.exists(f'{root_dir}/checkpoint')):
+        os.makedirs(f'{root_dir}/checkpoint')
     torch.save(model.state_dict(), f'{root_dir}/checkpoint/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}.pt')
 
     # Plot and save the result
