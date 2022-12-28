@@ -6,7 +6,7 @@ class BasicBlock(nn.Module):
     """Basic block that cascades two convolution operations and a max pooling operation in sequence
 
     """
-    def __init__(self, in_channels, out_channels, kernel_size):
+    def __init__(self, in_channels, out_channels, kernel_size=3):
         """Inits a basic block
 
         :param in_channels: The number of input channels
@@ -40,7 +40,7 @@ class BasicNet(nn.Module):
     """Basic cnn that cascades three basic blocks and three dense layers in sequence
 
     """
-    def __init__(self, kernel_size):
+    def __init__(self, kernel_size=3):
         """Inits a basic cnn
 
         :param kernel_size: The size of the kernel in `BasicBlock`
