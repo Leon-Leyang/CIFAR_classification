@@ -137,6 +137,6 @@ if __name__ == '__main__':
     batch_size = 64
     train_loader, test_loader = init_loader(64)
     model = BaseNet().to(device)
-    epoch = 5
+    epoch = 10
 
     train(model, train_loader, test_loader, epoch)

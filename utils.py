@@ -106,8 +106,6 @@ def plot_other_metric_svm(hyper_param_name, metric_name, metric_lst, hyper_param
     phase = 'test' if test else 'val'
     hyper_param_str = '_'.join(str_hyper_param_lst)
     root_dir = get_root_dir()
-    if not(os.path.exists(f'{root_dir}/result')):
-        os.makedirs(f'{root_dir}/result')
     plt.savefig(f'{root_dir}/result/{hyper_param_name}-{hyper_param_str}-{metric_name}-{phase}.png')
 
 
@@ -150,6 +148,10 @@ def plot_result_svm(hyper_param_name, hyper_param_lst, precision_lst, recall_lst
     :param accuracy_lst: List of the accuracy value
     :param test: If this plot is generated during test or validation
     """
+    # Ensure the path `result` exists
+    root_dir = get_root_dir()
+    if not (os.path.exists(f'{root_dir}/result')):
+        os.makedirs(f'{root_dir}/result')
     plot_other_metric_svm(hyper_param_name, 'precision', precision_lst, hyper_param_lst, test)
     plot_other_metric_svm(hyper_param_name, 'recall', recall_lst, hyper_param_lst, test)
     plot_other_metric_svm(hyper_param_name, 'f1', f1_lst, hyper_param_lst, test)
@@ -236,6 +238,10 @@ def plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_l
     :param f1_lst: List of the f1 value
     :param accuracy_lst: List of accuracy, where the first element is the train set accuracy and the second test set
     """
+    # Ensure the path `result` exists
+    root_dir = get_root_dir()
+    if not (os.path.exists(f'{root_dir}/result')):
+        os.makedirs(f'{root_dir}/result')
     plot_other_metric_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst)
     plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst)
 
