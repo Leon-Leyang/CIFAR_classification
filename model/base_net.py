@@ -37,6 +37,7 @@ class BasicNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.layer1 = BasicBlock(3, 32, 3)
+        self.dropout = nn.Dropout()
         self.layer2 = BasicBlock(32, 64, 3)
         self.layer3 = BasicBlock(64, 128, 3)
         self.fc1 = nn.Linear(128 * 4 * 4, 120)
@@ -49,7 +50,7 @@ class BasicNet(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = torch.flatten(out, 1)
-        out = self.relu((self.fc1(out)))
-        out = self.relu((self.fc2(out)))
+        out = self.dropout(self.relu((self.fc1(out))))
+        out = self.dropout(self.relu((self.fc2(out))))
         out = self.fc3(out)
         return out
