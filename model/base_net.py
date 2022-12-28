@@ -6,11 +6,12 @@ class BasicBlock(nn.Module):
     """Basic block that cascades two convolution operations and a max pooling operation in sequence
 
     """
-
     def __init__(self, in_channels, out_channels, kernal_size):
         super().__init__()
 
+        # Calculate the value of the padding to keep the height and width unchanged
         padding = int((kernal_size - 1) / 2)
+
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernal_size, padding=padding)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU()
@@ -33,7 +34,6 @@ class BasicNet(nn.Module):
     """Basic cn that cascades three basic blocks and three dense layers in sequence
 
     """
-
     def __init__(self):
         super().__init__()
         self.layer1 = BasicBlock(3, 32, 3)
