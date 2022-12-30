@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 
@@ -18,26 +17,29 @@ class BasicBlock(nn.Module):
         # Calculate the value of the padding to keep the height and width unchanged
         padding = int((kernel_size - 1) / 2)
 
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding)
-        self.bn1 = nn.BatchNorm2d(out_channels)
-        self.relu = nn.ReLU()
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size, padding=padding)
-        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.sub_layer1 = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
+
+        self.sub_layer2 = nn.Sequential(
+            nn.Conv2d(out_channels, out_channels, kernel_size, padding=padding),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
+
         self.pool = nn.MaxPool2d(2, 2)
 
     def forward(self, x):
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out = self.relu(out)
+        out = self.sub_layer1(x)
+        out = self.sub_layer2(out)
         out = self.pool(out)
         return out
 
 
 class BasicNet(nn.Module):
-    """Basic cnn that cascades three basic blocks and three dense layers in sequence
+    """Basic cnn that cascades three basic blocks and three fully connection layers in sequence
 
     """
     def __init__(self, kernel_size=3):
