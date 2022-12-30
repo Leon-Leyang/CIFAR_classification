@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import os
 
-from model.base_net import BasicNet
+from model.basic_net import BasicNet
 from utils import init_loader, get_root_dir, plot_result_cnn
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
@@ -29,6 +29,9 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     """
     # Init an optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+
+    # Init a scheduler to dynamically adjust the learning rate
+    # scheduler =
 
     # Init the loss function
     criterion = nn.CrossEntropyLoss()
@@ -139,8 +142,8 @@ def evaluate(model, test_loader, metric_lst):
 if __name__ == '__main__':
     batch_size = 16
     train_loader, test_loader = init_loader(batch_size)
-    model = BasicNet().to(device)
-    epoch = 20
+    model = BasicNet(3).to(device)
+    epoch = 50
     weight_decay = 0.001
 
     train(model, train_loader, test_loader, epoch, weight_decay=weight_decay)

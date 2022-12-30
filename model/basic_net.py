@@ -47,7 +47,7 @@ class BasicNet(nn.Module):
         """
         super().__init__()
         self.layer1 = BasicBlock(3, 32, kernel_size)
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Dropout(0.5)
         self.layer2 = BasicBlock(32, 64, kernel_size)
         self.layer3 = BasicBlock(64, 128, kernel_size)
         self.fc1 = nn.Linear(128 * 4 * 4, 120)
