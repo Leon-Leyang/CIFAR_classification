@@ -46,19 +46,21 @@ class BasicNet(nn.Module):
         :param kernel_size: The size of the kernel in `BasicBlock`
         """
         super().__init__()
-        self.layer1 = BasicBlock(3, 32, kernel_size)
-        self.dropout = nn.Dropout(0.5)
-        self.layer2 = BasicBlock(32, 64, kernel_size)
-        self.layer3 = BasicBlock(64, 128, kernel_size)
-        self.fc1 = nn.Linear(128 * 4 * 4, 120)
-        self.fc_relu = nn.ReLU()
-        self.fc2 = nn.Linear(120, 10)
+        self.feature_extraction_layer = nn.Sequential(
+            BasicBlock(3, 32, kernel_size),
+            BasicBlock(32, 64, kernel_size),
+            BasicBlock(64, 128, kernel_size)
+        )
+
+        self.classifer = nn.Sequential(
+            nn.Flatten(1),
+            nn.Linear(128 * 4 * 4, 120),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(120, 10)
+        )
 
     def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = torch.flatten(out, 1)
-        out = self.dropout(self.fc_relu((self.fc1(out))))
-        out = self.fc2(out)
+        feature = self.feature_extraction_layer(x)
+        out = self.classifer(feature)
         return out
