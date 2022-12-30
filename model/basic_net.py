@@ -51,16 +51,14 @@ class BasicNet(nn.Module):
         self.layer2 = BasicBlock(32, 64, kernel_size)
         self.layer3 = BasicBlock(64, 128, kernel_size)
         self.fc1 = nn.Linear(128 * 4 * 4, 120)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.fc_relu = nn.ReLU()
+        self.fc2 = nn.Linear(120, 10)
 
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
         out = self.layer3(out)
         out = torch.flatten(out, 1)
-        out = self.dropout(self.relu((self.fc1(out))))
-        out = self.dropout(self.relu((self.fc2(out))))
-        out = self.fc3(out)
+        out = self.dropout(self.fc_relu((self.fc1(out))))
+        out = self.fc2(out)
         return out
