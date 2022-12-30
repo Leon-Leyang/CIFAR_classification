@@ -31,7 +31,7 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     # Init a scheduler to dynamically adjust the learning rate
-    # scheduler =
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=25, gamma=0.5)
 
     # Init the loss function
     criterion = nn.CrossEntropyLoss()
@@ -93,6 +93,9 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
         accuracy_lst[1].append(test_accuracy)
         loss_lst[0].append(train_loss.detach().cpu())
         loss_lst[1].append(test_loss.cpu())
+
+        # Update the learning rate
+        scheduler.step()
 
     print('\nFinish training\n')
 
