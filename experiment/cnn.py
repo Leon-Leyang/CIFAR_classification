@@ -42,11 +42,16 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     # List to store the accuracy of the model on train set and test set in each epoch
     accuracy_lst = [[], []]
 
+    # List to store the loss of the model on train set and test set in each epoch
+    loss_lst = [[], []]
+
     # Iterate the training
     for e in range(epoch):
         # Lists for storing all ground truth labels and predictions for later accuracy evaluation
         gt_lst = []
         pred_lst = []
+
+        total_loss = 0
 
         model.train()
         # Train with each batch
@@ -68,14 +73,23 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
             _, preds = torch.max(outputs, 1)
             pred_lst += preds.tolist()
 
+            # Record the loss
+            total_loss += loss
+
             # print(f'epoch {e + 1}/{epoch}, batch {i + 1}/{batch}, loss: {loss:.4f}')
 
         # Evaluates the model's accuracy on the train set and test set in this epoch
         train_accuracy = accuracy_score(gt_lst, pred_lst)
         test_accuracy = evaluate(model, test_loader, ['accuracy'])[0]
-        print(f'epoch {e + 1}/{epoch}, loss: {loss}, train_accuracy: {train_accuracy}, test_accuracy: {test_accuracy}')
+        print(test_accuracy)
 
-        # Record the accuracy
+        # Calculate the average loss in on the train set and test set this epoch
+        train_loss = total_loss / 5000
+        test_loss = calc_test_loss(model, test_loader)
+
+        print(f'epoch {e + 1}/{epoch}, train_loss: {train_loss}, test_loss: {test_loss}, train_accuracy: {train_accuracy}, test_accuracy: {test_accuracy}')
+
+        # Record the accuracy and loss
         accuracy_lst[0].append(train_accuracy)
         accuracy_lst[1].append(test_accuracy)
 
@@ -137,6 +151,34 @@ def evaluate(model, test_loader, metric_lst):
             value = func(gt_lst, pred_lst, average=None)
         ret_lst.append(value)
     return ret_lst
+
+
+def calc_test_loss(model, test_loader):
+    """Calculates a model's average loss on the test set
+
+    :param model: The model to be evaluated
+    :param test_loader: Data loader for the test set
+    :return: The model's average loss on the test set
+    """
+    # Init the loss function
+    criterion = nn.CrossEntropyLoss()
+
+    total_loss = 0
+
+    model.eval()
+    with torch.no_grad():
+        for i, data in enumerate(test_loader):
+            inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            # Forward
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+
+            total_loss += loss
+
+    avg_loss = total_loss / 10000
+    return avg_loss
 
 
 if __name__ == '__main__':
