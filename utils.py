@@ -193,15 +193,16 @@ def plot_other_metric_cnn(model_name, epoch, lr, weight_decay, precision_lst, re
     plt.savefig(f'{root_dir}/result/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}-others.png')
 
 
-def plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst):
-    """Plots and saves a line chart for CNN experiment with two lines, where one line for train set accuracy and
+def plot_metric_cnn(model_name, epoch, lr, weight_decay, lst, metric_name):
+    """Plots and saves a line chart for CNN experiment with two lines, where one line for train set accuracy or loss and
     the other test set
 
     :param model_name: Name of the model
     :param epoch: Total number of epochs
     :param lr: Learning rate
     :param weight_decay: Weight decay
-    :param accuracy_lst: List of accuracy, where the first element is the train set accuracy and the second test set
+    :param lst: List of accuracy or loss, where the first element is from the train set and the second test set
+    :param metric_name: Name of the metric
     """
     # Clear the previous content
     plt.clf()
@@ -209,23 +210,23 @@ def plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst):
 
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    # Plot the accuracy
+    # Plot the metric
     epoch_lst = list(range(1, epoch + 1))
-    train_accuracy_lst, test_accuracy_lst = accuracy_lst
-    plt.plot(epoch_lst, train_accuracy_lst, marker='o', label='train')
-    plt.plot(epoch_lst, test_accuracy_lst, marker='o', label='test')
+    train_lst, test_lst = lst
+    plt.plot(epoch_lst, train_lst, marker='o', label='train')
+    plt.plot(epoch_lst, test_lst, marker='o', label='test')
 
     # Show the legend
     plt.legend()
     plt.xlabel('epoch')
-    plt.ylabel('accuracy')
+    plt.ylabel(metric_name)
 
     # Save the plot
     root_dir = get_root_dir()
-    plt.savefig(f'{root_dir}/result/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}-accuracy.png')
+    plt.savefig(f'{root_dir}/result/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}-{metric_name}.png')
 
 
-def plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst):
+def plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst, loss_lst):
     """Plots and saves the result for CNN experiment
 
     :param model_name: Name of the model
@@ -236,14 +237,15 @@ def plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_l
     :param recall_lst: List of the recall value
     :param f1_lst: List of the f1 value
     :param accuracy_lst: List of accuracy, where the first element is the train set accuracy and the second test set
+    :param loss_lst: List of loss, where the first element is the train set accuracy and the second test set
     """
     # Ensure the path `result` exists
     root_dir = get_root_dir()
     if not (os.path.exists(f'{root_dir}/result')):
         os.makedirs(f'{root_dir}/result')
     plot_other_metric_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst)
-    plot_accuracy_cnn(model_name, epoch, lr, weight_decay, accuracy_lst)
-
+    plot_metric_cnn(model_name, epoch, lr, weight_decay, accuracy_lst, 'accuracy')
+    plot_metric_cnn(model_name, epoch, lr, weight_decay, loss_lst, 'loss')
 
 if __name__ == '__main__':
     train_loader, test_loader = init_loader(full=True)

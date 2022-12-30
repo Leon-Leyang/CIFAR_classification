@@ -81,7 +81,6 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
         # Evaluates the model's accuracy on the train set and test set in this epoch
         train_accuracy = accuracy_score(gt_lst, pred_lst)
         test_accuracy = evaluate(model, test_loader, ['accuracy'])[0]
-        print(test_accuracy)
 
         # Calculate the average loss in on the train set and test set this epoch
         train_loss = total_loss / 5000
@@ -92,6 +91,8 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
         # Record the accuracy and loss
         accuracy_lst[0].append(train_accuracy)
         accuracy_lst[1].append(test_accuracy)
+        loss_lst[0].append(train_loss.detach().cpu())
+        loss_lst[1].append(test_loss.cpu())
 
     print('\nFinish training\n')
 
@@ -108,7 +109,7 @@ def train(model, train_loader, test_loader, epoch, lr=0.001, weight_decay=0.001)
     torch.save(model.state_dict(), f'{root_dir}/checkpoint/{model_name}-ep{epoch}-lr{lr}-wd{weight_decay}.pt')
 
     # Plot and save the result
-    plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst)
+    plot_result_cnn(model_name, epoch, lr, weight_decay, precision_lst, recall_lst, f1_lst, accuracy_lst, loss_lst)
 
 
 def evaluate(model, test_loader, metric_lst):
@@ -160,13 +161,14 @@ def calc_test_loss(model, test_loader):
     :param test_loader: Data loader for the test set
     :return: The model's average loss on the test set
     """
-    # Init the loss function
-    criterion = nn.CrossEntropyLoss()
-
-    total_loss = 0
-
-    model.eval()
     with torch.no_grad():
+        model.eval()
+
+        # Init the loss function
+        criterion = nn.CrossEntropyLoss()
+
+        total_loss = 0
+
         for i, data in enumerate(test_loader):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device)
@@ -177,8 +179,8 @@ def calc_test_loss(model, test_loader):
 
             total_loss += loss
 
-    avg_loss = total_loss / 10000
-    return avg_loss
+        avg_loss = total_loss / 10000
+        return avg_loss
 
 
 if __name__ == '__main__':
