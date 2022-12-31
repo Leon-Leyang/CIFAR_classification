@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import os
 
-from model.basic_net import BasicNet
+from model import *
 from utils import init_loader, get_root_dir, plot_result_cnn
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
@@ -189,7 +189,8 @@ def calc_test_loss(model, test_loader):
 if __name__ == '__main__':
     batch_size = 16
     train_loader, test_loader = init_loader(batch_size)
-    model = BasicNet(3).to(device)
+    # model = BasicNet(3).to(device)
+    model = GapNet(3).to(device)
     epoch = 50
     weight_decay = 0.001
 

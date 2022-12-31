@@ -19,7 +19,7 @@ class GapNet(nn.Module):
             BasicBlock(64, 128, kernel_size)
         )
 
-        self.classifer = nn.Sequential(
+        self.classifier = nn.Sequential(
             nn.Conv2d(128, 10, kernel_size),
             nn.BatchNorm2d(10),
             nn.ReLU(),

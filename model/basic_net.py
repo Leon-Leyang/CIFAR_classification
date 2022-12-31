@@ -54,7 +54,7 @@ class BasicNet(nn.Module):
             BasicBlock(64, 128, kernel_size)
         )
 
-        self.classifer = nn.Sequential(
+        self.classifier = nn.Sequential(
             nn.Flatten(1),
             nn.Linear(128 * 4 * 4, 120),
             nn.ReLU(),
