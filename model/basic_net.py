@@ -64,5 +64,5 @@ class BasicNet(nn.Module):
 
     def forward(self, x):
         feature = self.feature_extraction_layer(x)
-        out = self.classifer(feature)
+        out = self.classifier(feature)
         return out
