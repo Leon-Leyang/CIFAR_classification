@@ -190,7 +190,8 @@ if __name__ == '__main__':
     batch_size = 16
     train_loader, test_loader = init_loader(batch_size)
     # model = BasicNet(3).to(device)
-    model = GapNet(3).to(device)
+    # model = GapNet(3).to(device)
+    model = ResidualNet(3).to(device)
     epoch = 50
     weight_decay = 0.001
 
