@@ -1,22 +1,22 @@
 import torch.nn as nn
 
-from residual_net import ResidualBlock
+from res_net import ResBlock
 
 
-class ResidualGapNet(nn.Module):
-    """Cnn that cascades three residual blocks and uses global average pooling layer to replace fully connection layer
+class ResGapNet(nn.Module):
+    """Cnn that cascades three res blocks and uses global average pooling layer to replace fully connection layer
 
     """
     def __init__(self, kernel_size=3):
         """Inits the cnn
 
-        :param kernel_size: The size of the kernel in `ResidualBlock`
+        :param kernel_size: The size of the kernel in `ResBlock`
         """
         super().__init__()
         self.feature_extraction_layer = nn.Sequential(
-            ResidualBlock(3, 32, kernel_size),
-            ResidualBlock(32, 64, kernel_size),
-            ResidualBlock(64, 128, kernel_size)
+            ResBlock(3, 32, kernel_size),
+            ResBlock(32, 64, kernel_size),
+            ResBlock(64, 128, kernel_size)
         )
 
         # Calculate the value of the padding to keep the height and width unchanged
