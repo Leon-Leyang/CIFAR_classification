@@ -196,8 +196,9 @@ if __name__ == '__main__':
     # model = ResidualConcatNet(3).to(device)
     # model = ResidualGapNet(3).to(device)
     # model = ResGapNet(3).to(device)
-    model = SpatialNet(3).to(device)
-    epoch = 100
+    # model = SpatialNet(3).to(device)
+    model = SpatialGapNet(3).to(device)
+    epoch = 50
     weight_decay = 0.001
 
     train(model, train_loader, test_loader, epoch, weight_decay=weight_decay)
