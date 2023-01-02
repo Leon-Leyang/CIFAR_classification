@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from basic_net import BasicBlock
 
-class SpatialNet(nn.Module):
-    """Cnn that combines spatial variant features together
+class SpatialSeqNet(nn.Module):
+    """Cnn that combines spatial variant features generated in sequence together
 
     """
     def __init__(self, kernel_size=3):
