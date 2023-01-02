@@ -193,7 +193,8 @@ if __name__ == '__main__':
     # model = GapNet(3).to(device)
     # model = ResidualNet(3).to(device)
     # model = ResNet(3).to(device)
-    model = ResidualConcatNet(3).to(device)
+    # model = ResidualConcatNet(3).to(device)
+    model = ResidualGapNet(3).to(device)
     epoch = 50
     weight_decay = 0.001
 
