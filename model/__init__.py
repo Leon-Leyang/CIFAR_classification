@@ -10,6 +10,6 @@ from res_net import ResNet
 from residual_concat_net import ResidualConcatNet
 from residual_gap_net import ResidualGapNet
 from res_gap_net import ResGapNet
-from spatial_net import SpatialSeqNet
+from spatial_seq_net import SpatialSeqNet
 from spatial_seq_gap_net import SpatialSeqGapNet
 from spatial_para_net import SpatialParaNet
