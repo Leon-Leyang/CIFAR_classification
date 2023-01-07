@@ -198,7 +198,8 @@ if __name__ == '__main__':
     # model = ResGapNet(3).to(device)
     # model = SpatialNet(3).to(device)
     # model = SpatialGapNet(3).to(device)
-    model = SpatialParaNet().to(device)
+    # model = SpatialParaNet().to(device)
+    model = SpatialParaGapNet().to(device)
     epoch = 50
     weight_decay = 0.001
 
