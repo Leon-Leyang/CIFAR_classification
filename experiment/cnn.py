@@ -197,8 +197,8 @@ if __name__ == '__main__':
     model = ResidualConcatGapNet(3).to(device)
     # model = ResidualGapNet(3).to(device)
     # model = ResGapNet(3).to(device)
-    # model = SpatialNet(3).to(device)
-    # model = SpatialGapNet(3).to(device)
+    # model = SpatialSeqNet(3).to(device)
+    # model = SpatialSeqGapNet(3).to(device)
     # model = SpatialParaNet().to(device)
     # model = SpatialParaGapNet().to(device)
     epoch = 50
